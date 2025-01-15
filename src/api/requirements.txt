@@ -17,7 +17,8 @@ opentelemetry-instrumentation
 azure-identity==1.19.0
 azure-ai-contentsafety
 azure-ai-inference
-https://remoteevalbugbash.blob.core.windows.net/remoteevalbugbash/azure_ai_project-1.0.0b1-py3-none-any.whl
+azure-ai-projects
+#https://remoteevalbugbash.blob.core.windows.net/remoteevalbugbash/azure_ai_project-1.0.0b1-py3-none-any.whl
 gunicorn==21.2.0
 azure-keyvault-secrets
 aiohttp==3.9.5
@@ -31,6 +32,6 @@ opentelemetry-instrumentation-openai-v2
 azure-ai-inference[opentelemetry]
 # azure-ai-inference[opentelemetry]  ./packages/whl packages
 # azure-ai-projects is not available in PyPI install it from the ./packages/whl packages
-./packages/azure_ai_inference-1.0.0b6-py3-none-any.whl
-./packages/azure_ai_projects-1.0.0b1-py3-none-any.whl
+# ./packages/azure_ai_inference-1.0.0b6-py3-none-any.whl
+# ./packages/azure_ai_projects-1.0.0b1-py3-none-any.whl
 
