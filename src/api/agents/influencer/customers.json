@@ -1,0 +1,32 @@
+[
+    {
+        "name": "Alice Johnson",
+        "demographic": {
+            "age": 28,
+            "gender": "Female",
+            "location": "San Francisco, CA"
+        },
+        "incomeLevel": 85000,
+        "interests": ["Traveling", "Yoga", "Cooking"]
+    },
+    {
+        "name": "Michael Smith",
+        "demographic": {
+            "age": 45,
+            "gender": "Male",
+            "location": "Chicago, IL"
+        },
+        "incomeLevel": 120000,
+        "interests": ["Golf", "Tech Gadgets", "Reading"]
+    },
+    {
+        "name": "Maria Garcia",
+        "demographic": {
+            "age": 32,
+            "gender": "Female",
+            "location": "Austin, TX"
+        },
+        "incomeLevel": 95000,
+        "interests": ["Music", "Fitness", "Photography"]
+    }
+]
