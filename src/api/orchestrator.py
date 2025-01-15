@@ -10,10 +10,11 @@ from agents.product import product
 from agents.writer import writer
 from agents.designer import designer
 from agents.editor import editor
+from agents.influencer import influencer
 from evaluate.evaluators import evaluate_article_in_background
 from prompty.tracer import trace, Tracer, console_tracer, PromptyTracer
 
-types = Literal["message", "researcher", "marketing", "designer","writer", "editor", "error", "partial", ]
+types = Literal["message", "researcher", "marketing", "designer","writer", "editor", "influencer", "error", "partial", ]
 
 class Message(BaseModel):
     type: types
@@ -137,6 +138,9 @@ def create(research_context, product_context, assignment_context, evaluate=False
         yield complete_message("editor", editor_response)
         yield complete_message("writer", {"complete": True})
 
+    yield start_message("influencer")
+    influencer_response = influencer.influence(processed_writer_result['article'],customers=None)
+    yield complete_message("influencer", influencer_response)
     #these need to be yielded for calling evals from evaluate.evaluate
     yield send_research(research_result)
     yield send_products(product_result)

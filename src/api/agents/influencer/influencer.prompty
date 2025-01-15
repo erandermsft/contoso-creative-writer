@@ -17,7 +17,14 @@ model:
           type: json_object
 sample:
   customers: ${file:customers.json}
-  article: ${file:article.json}
+  article: ${file:article.txt}
+inputs: 
+  article:
+    type: string
+    default: " "
+  customers:
+    type: string
+    default: " "
 ---
 
 system:
@@ -58,7 +65,7 @@ interests:
 
 
 # Article
-Use the following context to provide a more personalized response to {{firstName}}:
-{{article.contents}}
+Use the following article as context
+{{article}}
 
 

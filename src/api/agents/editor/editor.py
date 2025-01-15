@@ -3,11 +3,12 @@ import json
 import os 
 from dotenv import load_dotenv 
 from pathlib import Path
+from prompty.tracer import trace
 folder = Path(__file__).parent.absolute().as_posix()
 
 
 load_dotenv()
-
+@trace
 def edit(article, feedback):
     
     # Load prompty with AzureOpenAIModelConfiguration override
