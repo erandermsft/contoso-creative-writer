@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from opentelemetry._events import set_event_logger_provider
 from opentelemetry.sdk._events import EventLoggerProvider
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-from prompty.tracer import Tracer, PromptyTracer,console_tracer
+from prompty.tracer import Tracer, PromptyTracer
 from azure.ai.projects import AIProjectClient
 from azure.identity import DefaultAzureCredential    
 from azure.monitor.opentelemetry import configure_azure_monitor
@@ -23,11 +23,8 @@ def trace_span(name: str):
             key, json.dumps(value).replace("\n", "")
         )
 
-
-
 def setup_telemetry(app: FastAPI):
     settings.tracing_implementation = "OpenTelemetry"
-    local_tracing_enabled=os.getenv("LOCAL_TRACING_ENABLED")
     otel_exporter_endpoint = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT")
    
     # Get the connection string from the environment variables
@@ -46,24 +43,35 @@ def setup_telemetry(app: FastAPI):
             print("Enable it via the 'Tracing' tab in your AI Studio project page.")
             exit()
         
-        # Enable local tracing with Prompty
-        if local_tracing_enabled and local_tracing_enabled.lower() == "true":
+        if not otel_exporter_endpoint:
+            configure_azure_monitor(connection_string=application_insights_connection_string)         
 
-            project_client.telemetry.enable(destination=otel_exporter_endpoint)            
-            Tracer.add("console", console_tracer)
-            json_tracer = PromptyTracer()
-            Tracer.add("PromptyTracer", json_tracer.tracer)            
+        print("Using OTLP endpoint: " + otel_exporter_endpoint)
+        project_client.telemetry.enable(destination=otel_exporter_endpoint)     
+        json_tracer = PromptyTracer()
+        Tracer.add("PromptyTracer", json_tracer.tracer)       
+        Tracer.add("OpenTelemetry", trace_span)
+        event_provider = EventLoggerProvider()
+        set_event_logger_provider(event_provider)  
 
-        elif application_insights_connection_string: # Enable cloud tracing with Azure Monitor
+        # # Enable local tracing with Prompty
+        # if local_tracing_enabled and local_tracing_enabled.lower() == "true":
 
-            # This enbles instrumention for opentelemetry-instrumentation-openai-v2
-            project_client.telemetry.enable(destination=None)
-            configure_azure_monitor(connection_string=application_insights_connection_string)            
-            Tracer.add("OpenTelemetry", trace_span)
+        #     project_client.telemetry.enable(destination=otel_exporter_endpoint)            
+        #     Tracer.add("console", console_tracer)
+        #     json_tracer = PromptyTracer()
+        #     Tracer.add("PromptyTracer", json_tracer.tracer)            
 
-            # Set the EventLoggerProvider as opentelemetry-instrumentation-openai-v2 use log events to log tokens
-            event_provider = EventLoggerProvider()
-            set_event_logger_provider(event_provider)
+        # elif application_insights_connection_string: # Enable cloud tracing with Azure Monitor
+
+        #     # This enbles instrumention for opentelemetry-instrumentation-openai-v2
+        #     project_client.telemetry.enable(destination=None)
+        #     configure_azure_monitor(connection_string=application_insights_connection_string)            
+        #     Tracer.add("OpenTelemetry", trace_span)
+
+        #     # Set the EventLoggerProvider as opentelemetry-instrumentation-openai-v2 use log events to log tokens
+        #     event_provider = EventLoggerProvider()
+        #     set_event_logger_provider(event_provider)
 
     # Instrument FastAPI and exclude the send span to reduce noise
     FastAPIInstrumentor.instrument_app(app,exclude_spans=["send"])

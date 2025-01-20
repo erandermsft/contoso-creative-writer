@@ -17,6 +17,8 @@ param applicationInsightsName string = ''
 param containerRegistryName string = ''
 @description('Name of the Azure Cognitive Search service')
 param searchServiceName string = ''
+@description('The Grafana name')
+param grafanaName string = ''
 
 module keyVault '../security/keyvault.bicep' = {
   name: 'keyvault'
@@ -114,6 +116,14 @@ module applicationInsights '../monitor/applicationinsights.bicep' =
     }
   }
 
+module grafana '../monitor/grafana.bicep' = 
+  if (!empty(grafanaName)) {
+    name: 'grafana'
+    params: {
+      grafanaName: grafanaName
+    }
+  }
+
 module containerRegistry '../host/container-registry.bicep' =
   if (!empty(containerRegistryName)) {
     name: 'containerRegistry'
@@ -139,7 +149,7 @@ module searchService '../search/search-services.bicep' = {
     name: 'search'
     params: {
       name: searchServiceName
-      location: 'eastus'
+      location: location
       semanticSearch: 'standard'
       disableLocalAuth: true
     }

@@ -2,6 +2,7 @@ metadata description = 'Creates an Application Insights instance and a Log Analy
 param logAnalyticsName string
 param applicationInsightsName string
 param applicationInsightsDashboardName string = ''
+param grafanaName string = ''
 param location string = resourceGroup().location
 param tags object = {}
 
@@ -22,6 +23,14 @@ module applicationInsights 'applicationinsights.bicep' = {
     tags: tags
     dashboardName: applicationInsightsDashboardName
     logAnalyticsWorkspaceId: logAnalytics.outputs.id
+  }
+}
+
+module grafana 'grafana.bicep' = {
+  name: 'grafana'
+  params: {
+    grafanaName: grafanaName
+    location: location
   }
 }
 

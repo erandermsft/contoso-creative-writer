@@ -7,6 +7,22 @@ param environmentName string
 
 @minLength(1)
 @description('Primary location for all resources')
+@allowed([
+  'canadaeast'
+  'eastus'
+  'eastus2'
+  'northcentralus'
+  'southcentralus'
+  'swedencentral'
+  'francecentral'
+  'westus'
+  'westus3'
+])
+@metadata({
+  azd: {
+    type: 'location'
+  }
+})
 param location string
 
 @minLength(1)
@@ -18,6 +34,7 @@ param location string
   'northcentralus'
   'southcentralus'
   'swedencentral'
+  'francecentral'
   'westus'
   'westus3'
 ])
@@ -26,7 +43,7 @@ param location string
     type: 'location'
   }
 })
-param openAILocation string = 'swedencentral'
+param openAILocation string
 
 param containerRegistryName string = ''
 param aiHubName string = ''
@@ -138,6 +155,7 @@ module ai 'core/host/ai-environment.bicep' = {
     openAiConnectionName: !empty(openAiConnectionName) ? openAiConnectionName : 'aoai-connection'
     openAiContentSafetyConnectionName: !empty(openAiContentSafetyConnectionName) ? openAiContentSafetyConnectionName : 'aoai-content-safety-connection'
     openAiModelDeployments: array(contains(aiConfig, 'deployments') ? aiConfig.deployments : [])
+    grafanaName: 'grafana-${resourceToken}'
     logAnalyticsName: !useApplicationInsights
       ? ''
       : !empty(logAnalyticsWorkspaceName)
@@ -174,6 +192,7 @@ module containerApps 'core/host/container-apps.bicep' = {
     containerAppsEnvironmentName: 'agent-ca-env'
     containerRegistryName: ai.outputs.containerRegistryName
     logAnalyticsWorkspaceName: ai.outputs.logAnalyticsWorkspaceName
+    applicationInsightsName: ai.outputs.applicationInsightsName
   }
 }
 

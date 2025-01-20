@@ -29,6 +29,7 @@ validators
 azureml-mlflow
 azure-monitor-opentelemetry
 opentelemetry-instrumentation-openai-v2
+opentelemetry-exporter-otlp-proto-grpc
 azure-ai-inference[opentelemetry]
 # azure-ai-inference[opentelemetry]  ./packages/whl packages
 # azure-ai-projects is not available in PyPI install it from the ./packages/whl packages

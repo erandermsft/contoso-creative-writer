@@ -28,6 +28,8 @@ param containerRegistryName string = ''
 param searchServiceName string = ''
 @description('The Azure Search connection name.')
 param searchConnectionName string = ''
+@description('The Grafana name')
+param grafanaName string = ''
 param tags object = {}
 
 module hubDependencies '../ai/hub-dependencies.bicep' = {
@@ -43,6 +45,7 @@ module hubDependencies '../ai/hub-dependencies.bicep' = {
     openAiName: openAiName
     openAiModelDeployments: openAiModelDeployments
     searchServiceName: searchServiceName
+    grafanaName: grafanaName
   }
 }
 

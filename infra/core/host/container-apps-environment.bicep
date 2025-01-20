@@ -4,15 +4,21 @@ param location string = resourceGroup().location
 param tags object = {}
 
 @description('Name of the Application Insights resource')
-param applicationInsightsName string = ''
-
-@description('Specifies if Dapr is enabled')
-param daprEnabled bool = false
+param applicationInsightsName string
 
 @description('Name of the Log Analytics workspace')
 param logAnalyticsWorkspaceName string
 
-resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' = {
+
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {
+  name: logAnalyticsWorkspaceName
+}
+
+resource applicationInsights 'Microsoft.Insights/components@2020-02-02' existing = {
+  name: applicationInsightsName
+}
+
+resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-10-02-preview' = {
   name: name
   location: location
   tags: tags
@@ -24,16 +30,30 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2023-05-01'
         sharedKey: logAnalyticsWorkspace.listKeys().primarySharedKey
       }
     }
-    daprAIInstrumentationKey: daprEnabled && !empty(applicationInsightsName) ? applicationInsights.properties.InstrumentationKey : ''
+    appInsightsConfiguration: {
+      connectionString: applicationInsights.properties.ConnectionString
+    }
+    openTelemetryConfiguration: {
+      logsConfiguration: {
+        destinations: ['appInsights']
+      }
+      metricsConfiguration: {
+        destinations: [] // appInsights not supported yet
+      }
+      tracesConfiguration: {
+        destinations: ['appInsights']
+      }
+      destinationsConfiguration: {
+        otlpConfigurations: []
+      }
+    }
+    workloadProfiles: [
+      {
+        name: 'Consumption'
+        workloadProfileType: 'Consumption'
+      }
+    ]
   }
-}
-
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10-01' existing = {
-  name: logAnalyticsWorkspaceName
-}
-
-resource applicationInsights 'Microsoft.Insights/components@2020-02-02' existing = if (daprEnabled && !empty(applicationInsightsName)) {
-  name: applicationInsightsName
 }
 
 output defaultDomain string = containerAppsEnvironment.properties.defaultDomain
