@@ -7,8 +7,8 @@ from .evaluators import ArticleEvaluator, ImageEvaluator
 from orchestrator import create
 from prompty.tracer import trace
 from azure.identity import DefaultAzureCredential
-from azure.ai.project import AIProjectClient
-from azure.ai.project.models import Evaluation, Dataset, EvaluatorConfiguration, ConnectionType
+from azure.ai.projects import AIProjectClient
+from azure.ai.projects.models import Evaluation, Dataset, EvaluatorConfiguration, ConnectionType
 from openai import AzureOpenAI
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 
@@ -113,12 +113,13 @@ def evaluate_remote(data_path):
 
 
 
-def run_orchestrator(research_context, product_context, assignment_context):
-    query = {"research_context": research_context, "product_context": product_context, "assignment_context": assignment_context}
+def run_orchestrator(research_context, product_context, assignment_context, influencer_context):
+    query = {"research_context": research_context, "product_context": product_context, "assignment_context": assignment_context, "influencer_context": influencer_context}
     context = {}
     response = None
+    social_posts = None
 
-    for result in create(research_context, product_context, assignment_context,evaluate=False):
+    for result in create(research_context, product_context, assignment_context, influencer_context,evaluate=False):
         if not type(result) == tuple:
             parsed_result = json.loads(result)
         if type(parsed_result) is list:
@@ -128,11 +129,13 @@ def run_orchestrator(research_context, product_context, assignment_context):
                 context['products'] = parsed_result[1]
             if parsed_result[0] == "writer":
                 response = parsed_result[1]
-    
+            if parsed_result[0] == "influencer":
+                social_posts = parsed_result[1]
     return {
         "query": json.dumps(query), 
         "context": json.dumps(context), 
         "response": json.dumps(response),
+        "social_posts": json.dumps(social_posts)
     }
 
 @trace
@@ -148,7 +151,7 @@ def evaluate_orchestrator(model_config, project_scope,  data_path):
             row = json.loads(line)
             data.append(row)
             print(f"generating article {num +1}")
-            eval_data.append(run_orchestrator(row["research_context"], row["product_context"], row["assignment_context"]))
+            eval_data.append(run_orchestrator(row["research_context"], row["product_context"], row["assignment_context"], row["influencer_context"]))
 
     # write out eval data to a file so we can re-run evaluation on it
     with jsonlines.open(folder + '/eval_data.jsonl', 'w') as writer:
@@ -426,7 +429,7 @@ if __name__ == "__main__":
     
 
     model_config = {
-        "azure_deployment":os.environ["AZURE_OPENAI_DEPLOYMENT_NAME"],   
+        "azure_deployment":os.environ["AZURE_OPENAI_4_EVAL_DEPLOYMENT_NAME"],   
         "api_version":os.environ["AZURE_OPENAI_API_VERSION"],
         "azure_endpoint":f"https://{os.getenv('AZURE_OPENAI_NAME')}.cognitiveservices.azure.com/"
     }
@@ -439,7 +442,7 @@ if __name__ == "__main__":
     start=time.time()
     print(f"Starting evaluate...")
 
-    eval_result = evaluate_orchestrator(model_config, project_scope, data_path=folder +"/eval_inputs.jsonl")
+    eval_result = evaluate_orchestrator(model_config, project_scope, data_path=folder +"/eval_inputs_synth.jsonl")
     evaluate_remote(data_path=folder +"/eval_data.jsonl")
 
     img_paths = []

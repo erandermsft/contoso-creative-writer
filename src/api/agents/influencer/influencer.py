@@ -9,7 +9,7 @@ folder = Path(__file__).parent.absolute().as_posix()
 
 load_dotenv()
 @trace
-def influence(article, customers):
+def influence(article, customers, instructions):
     
     # Load prompty with AzureOpenAIModelConfiguration override
     configuration = AzureOpenAIModelConfiguration(
@@ -30,7 +30,7 @@ def influence(article, customers):
         #load from customers.json
         customers = json.loads(open(folder + "/customers.json").read())
         # result = prompty_obj(article=article)
-    result = prompty_obj(article=article,customers=customers)
+    result = prompty_obj(article=article,customers=customers, instructions=instructions)
     # result = prompty_obj(article=article, feedback=feedback,)
     
     return result

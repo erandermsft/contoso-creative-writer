@@ -61,9 +61,11 @@ def send_products(product_result):
 
 def send_writer(full_result):
     return json.dumps(("writer", full_result))
+def send_influencer(full_result):
+    return json.dumps(("influencer", full_result))
 
 @trace
-def create(research_context, product_context, assignment_context, evaluate=False):
+def create(research_context, product_context, assignment_context, influencer_context=None, evaluate=False):
     
     feedback = "No Feedback"
 
@@ -139,12 +141,13 @@ def create(research_context, product_context, assignment_context, evaluate=False
         yield complete_message("writer", {"complete": True})
 
     yield start_message("influencer")
-    influencer_response = influencer.influence(processed_writer_result['article'],customers=None)
-    yield complete_message("influencer", influencer_response)
+    influencer_response = influencer.influence(processed_writer_result['article'],customers=None, instructions=influencer_context)
+    yield complete_message("influencer", {"complete": True, "posts": influencer_response})
     #these need to be yielded for calling evals from evaluate.evaluate
     yield send_research(research_result)
     yield send_products(product_result)
-    yield send_writer(full_result) 
+    yield send_writer(full_result)
+    yield send_influencer(influencer_response)
 
     if evaluate:
         print("Evaluating article...")
