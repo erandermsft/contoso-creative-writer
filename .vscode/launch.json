@@ -25,7 +25,7 @@
       "name": "Python: Evaluate",
       "type": "debugpy",
       "request": "launch",
-      "module": "api.evaluate.evaluate",
+      "module": "evaluate.evaluate",
       "cwd": "${workspaceFolder}/src/api",
       "justMyCode": true
     },
