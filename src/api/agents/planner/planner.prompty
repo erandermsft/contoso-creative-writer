@@ -47,7 +47,7 @@ Example:
   "research": "Can you find the latest camping trends and what folks are doing in the winter?",
   "products": "Can you use a selection of tents and sleeping bags as context?"
   "assignment": "Write a fun and engaging article that includes the research and product information. The article should be between 800 and 1000 words. Make sure to cite sources in the article as you mention the research not at the end."
-  "inlfuencer" : "Create a social media post based on the article. Make sure to include emojis and other social media elements to make the post engaging and fun."
+  "influencer" : "Create a social media post based on the article. Make sure to include emojis and other social media elements to make the post engaging and fun."
 }
 
 
