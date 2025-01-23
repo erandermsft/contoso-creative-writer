@@ -45,14 +45,14 @@ def setup_telemetry(app: FastAPI):
         
         if not otel_exporter_endpoint:
             configure_azure_monitor(connection_string=application_insights_connection_string)         
-
-        print("Using OTLP endpoint: " + otel_exporter_endpoint)
-        project_client.telemetry.enable(destination=otel_exporter_endpoint)     
-        json_tracer = PromptyTracer()
-        Tracer.add("PromptyTracer", json_tracer.tracer)       
-        Tracer.add("OpenTelemetry", trace_span)
-        event_provider = EventLoggerProvider()
-        set_event_logger_provider(event_provider)  
+        else:
+            print("Using OTLP endpoint: " + otel_exporter_endpoint)
+            project_client.telemetry.enable(destination=otel_exporter_endpoint)     
+            json_tracer = PromptyTracer()
+            Tracer.add("PromptyTracer", json_tracer.tracer)       
+            Tracer.add("OpenTelemetry", trace_span)
+            event_provider = EventLoggerProvider()
+            set_event_logger_provider(event_provider)  
 
         # # Enable local tracing with Prompty
         # if local_tracing_enabled and local_tracing_enabled.lower() == "true":

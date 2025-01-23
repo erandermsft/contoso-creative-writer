@@ -1,0 +1,53 @@
+---
+name: Planner
+description: Generate tasks for agents in an agent based system
+model:
+  api: chat
+  configuration:
+    type: azure_openai
+    azure_endpoint: ${env:AZURE_OPENAI_ENDPOINT}
+    azure_deployment: gpt-4-evals
+    api_version: 2024-07-01-preview
+  parameters:
+    max_tokens: 1000
+    temperature: 0.9
+    frequency_penalty: 0.5
+    response_format:
+      type: json_object
+inputs:
+  goal:
+    type: string
+  agent_definitions: 
+    type: object
+sample:
+    goal: "Write an article about winter camping"
+    agent_definitions: ${file:agent_definitions.json}
+---
+system:
+You are an AI assistant. You task is to generate tasks for agents in an agent based system. You have been provided with an overreaching goal and a set of agent definitions. You need to generate tasks for each agent in order to achieve that goal.
+user:
+
+# Goal:
+{{goal}}
+
+# Agent system definition
+
+{% for agent in agent_definitions %}
+ - {{agent.Type}} -- {{agent.Description}}
+{% endfor %}
+
+# Guidelines:
+Generate one task per agent based on the context provided and the agent definitions. Make sure to provide a task that is clear and actionable. The task should be specific to the agent's role and should help in achieving the overreaching goal.
+
+The output should be in JSON format. The json key for each should be the agent's type without the word agent. So assignment agent becomes assignment.
+
+Example:
+
+{
+  "research": "Can you find the latest camping trends and what folks are doing in the winter?",
+  "products": "Can you use a selection of tents and sleeping bags as context?"
+  "assignment": "Write a fun and engaging article that includes the research and product information. The article should be between 800 and 1000 words. Make sure to cite sources in the article as you mention the research not at the end."
+  "inlfuencer" : "Create a social media post based on the article. Make sure to include emojis and other social media elements to make the post engaging and fun."
+}
+
+

@@ -11,6 +11,7 @@ from agents.writer import writer
 from agents.designer import designer
 from agents.editor import editor
 from agents.influencer import influencer
+from agents.planner import planner
 from evaluate.evaluators import evaluate_article_in_background
 from prompty.tracer import trace, Tracer, console_tracer, PromptyTracer
 
@@ -24,11 +25,14 @@ class Message(BaseModel):
     def to_json_line(self):
         return self.model_dump_json().replace("\n", "") + "\n"
 
+class Goal(BaseModel):
+    goal: str
 
 class Task(BaseModel):
     research: str 
     products: str 
-    assignment: str 
+    assignment: str
+    influence: str 
 
 DEFAULT_LOG_LEVEL = 25
 
@@ -63,6 +67,13 @@ def send_writer(full_result):
     return json.dumps(("writer", full_result))
 def send_influencer(full_result):
     return json.dumps(("influencer", full_result))
+
+@trace
+def plan(goal):
+    # yield start_message("planner")
+    plan_result = planner.plan(goal)
+    return plan_result
+    # yield complete_message("researcher", plan_result)
 
 @trace
 def create(research_context, product_context, assignment_context, influencer_context=None, evaluate=False):

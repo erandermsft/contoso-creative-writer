@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IArticleCollection } from ".";
+import { ISocialMediaPost} from "../store";
 
 const initialState: IArticleCollection = {
   current: 0,
@@ -30,9 +31,13 @@ const articleSlice = createSlice({
       state.articles[state.current] += action.payload;
       state.currentArticle = state.articles[state.current];
     },
+    addSocialMediaPostsToCurrentArticle: (state, action: PayloadAction<ISocialMediaPost>) => {
+      state.articles[state.current] += "\n\nCustomer: "+ action.payload.customer + "\n\n" + action.payload.socialMediaPost + "\n\n";
+      state.currentArticle = state.articles[state.current];
+    },
   },
 });
 
-export const { addArticle, clearArticles, setCurrentArticle, addToCurrentArticle } =
+export const { addArticle, clearArticles, setCurrentArticle, addToCurrentArticle, addSocialMediaPostsToCurrentArticle } =
   articleSlice.actions;
 export default articleSlice.reducer;
