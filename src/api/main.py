@@ -10,7 +10,7 @@ from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from fastapi import FastAPI, File, UploadFile
 from evaluate.evaluators import evaluate_image
 
-from orchestrator import Task, create
+from orchestrator import Task, create, plan, Goal
 from telemetry import setup_telemetry
 
 base = Path(__file__).resolve().parent
@@ -48,13 +48,24 @@ setup_telemetry(app)
 async def root():
     return {"message": "Hello World"}
 
+@trace
+@app.post("/api/plan")
+async def create_plan(goal: Goal):
+    return JSONResponse(
+        plan(goal.goal)
+        # PromptyStream(
+
+        #     "create_plan", plan(goal.goal)
+        # ),
+        # media_type="text/event-stream",
+    )
 
 @app.post("/api/article")
 @trace
 async def create_article(task: Task):
     return StreamingResponse(
         PromptyStream(
-            "create_article", create(task.research, task.products, task.assignment)
+            "create_article", create(task.research, task.products, task.assignment, task.influence)
         ),
         media_type="text/event-stream",
     )
