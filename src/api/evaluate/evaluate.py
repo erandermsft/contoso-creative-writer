@@ -4,7 +4,7 @@ import sys
 import json
 from pathlib import Path
 from .evaluators import ArticleEvaluator, ImageEvaluator
-from orchestrator import create
+from orchestrator import create, plan
 from prompty.tracer import trace
 from azure.identity import DefaultAzureCredential
 from azure.ai.projects import AIProjectClient
@@ -132,8 +132,8 @@ def run_orchestrator(research_context, product_context, assignment_context, infl
             if parsed_result[0] == "influencer":
                 social_posts = parsed_result[1]
     return {
-        "query": json.dumps(query), 
-        "context": json.dumps(context), 
+        # "query": json.dumps(query), 
+        # "context": json.dumps(context), 
         "response": json.dumps(response),
         "social_posts": json.dumps(social_posts)
     }
@@ -204,7 +204,32 @@ def evaluate_orchestrator(model_config, project_scope,  data_path):
     #     writer.write(eval_results)
 
     return None
+@trace
+def evaluate_orchestrator_with_plan(model_config, project_scope, plans):
+    writer_evaluator = ArticleEvaluator(model_config, project_scope)
 
+    data = []    
+    eval_data = []
+    print(f"\n===== Creating articles to evaluate using plans provided")
+    print("")
+    for plan in plans:
+        data_row = run_orchestrator(plan["research"], plan["products"], plan["assignment"], plan["influencer"])
+        data_row["input"] = plan["input"]
+        try:
+            append_to_jsonl(folder + '/eval_data.jsonl', data_row)
+        except Exception as e:
+            print(f"Error writing to file: {e}")
+    # with open(data_path) as f:
+    #     for num, line in enumerate(f):
+    #         row = json.loads(line)
+    #         data.append(row)
+    #         print(f"generating article {num +1}")
+    #         data_row = run_orchestrator(row["research_context"], row["product_context"], row["assignment_context"], influencer_context=None)
+    #         # eval_data.append(run_orchestrator(row["research_context"], row["product_context"], row["assignment_context"], row["influencer_context"]))
+    #         try:
+    #             append_to_jsonl(folder + '/eval_data.jsonl', data_row)
+    #         except Exception as e:
+    #             print(f"Error writing to file: {e}")
 def evaluate_image(project_scope,  image_path):
     image_evaluator = ImageEvaluator(project_scope)
 
@@ -435,8 +460,18 @@ def evaluate_image(project_scope,  image_path):
         print("No scores are greater than 1.")
 
     return scores
-
-
+@trace
+def evaluate_planner(model_config, project_scope, data_path):
+    results = []
+    with open(data_path) as f:
+        for num, line in enumerate(f):
+            row = json.loads(line)
+            print(f"generating plan {num +1}")
+            result = plan(row["goal"])
+            result["input"] = row["goal"]
+            
+            results.append(result)
+    return results    
 
 if __name__ == "__main__":
     import time
@@ -458,18 +493,22 @@ if __name__ == "__main__":
     start=time.time()
     print(f"Starting evaluate...")
 
-    eval_result = evaluate_orchestrator(model_config, project_scope, data_path=folder +"/eval_inputs_synth.jsonl")
-    evaluate_remote(data_path=folder +"/eval_data.jsonl")
 
-    img_paths = []
-    # This is code to add an image from a file path
-    for image_num in range(1,4):
-        parent = pathlib.Path(__file__).parent.resolve()
-        path = os.path.join(parent, "data")
-        image_path = os.path.join(path, f"{image_num}.png")
-        img_paths.append(image_path)
 
-    eval_image_result = evaluate_image(project_scope, img_paths)
+    plan_result = evaluate_planner(model_config, project_scope, data_path=folder +"/eval_inputs_goal.jsonl")
+    evaluate_orchestrator_with_plan(model_config, project_scope, plan_result)
+    # eval_result = evaluate_orchestrator(model_config, project_scope, data_path=folder +"/eval_inputs_synth.jsonl")
+    # evaluate_remote(data_path=folder +"/eval_data.jsonl")
+
+    # img_paths = []
+    # # This is code to add an image from a file path
+    # for image_num in range(1,4):
+    #     parent = pathlib.Path(__file__).parent.resolve()
+    #     path = os.path.join(parent, "data")
+    #     image_path = os.path.join(path, f"{image_num}.png")
+    #     img_paths.append(image_path)
+
+    # eval_image_result = evaluate_image(project_scope, img_paths)
 
     end=time.time()
     print(f"Finished evaluate in {end - start}s")
