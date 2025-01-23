@@ -62,5 +62,5 @@ Use the following article as context
 
 # Output format
 Only output the full array of social media posts. Its important that the output is a JSON array.
-The scoial media post should just contain to keys, customer and socialMediaPost, nothing else.
+The scoial media post should just contain two keys, customer and socialMediaPost, nothing else.
 
