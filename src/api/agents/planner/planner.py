@@ -3,6 +3,7 @@ import json
 import os 
 from dotenv import load_dotenv 
 from pathlib import Path
+import prompty
 from prompty.tracer import trace
 folder = Path(__file__).parent.absolute().as_posix()
 
@@ -27,6 +28,13 @@ def plan(goal):
 
     prompty_obj = Prompty.load(path_to_prompty, model=override_model)
     result = prompty_obj(goal=goal, agent_definitions=agent_definitions)
+    # result = prompty.execute(
+    #     "planner.prompty",
+    #     inputs={
+    #         "goal": goal,
+    #         "agent_definitions": agent_definitions,
+    #     },
+    # )
     
     return result
 

@@ -44,7 +44,7 @@ location: {{ item.demographic.location }}
 
 gender: {{item.demographic.gender}}
 
-income: {{item.incomeLevel | default('N/A')}}
+income: {{item.incomeLevel}}
 
 interests:
 {% for interest in item.interests %}

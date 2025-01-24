@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv 
 from pathlib import Path
 from prompty.tracer import trace
+import prompty
 folder = Path(__file__).parent.absolute().as_posix()
 
 
@@ -31,7 +32,14 @@ def influence(article, customers, instructions):
         customers = json.loads(open(folder + "/customers.json").read())
         # result = prompty_obj(article=article)
     result = prompty_obj(article=article,customers=customers, instructions=instructions)
-    # result = prompty_obj(article=article, feedback=feedback,)
+    # result = prompty.execute(
+    #     "influencer.prompty",
+    #     inputs={
+    #         "article": article,
+    #         "customers": customers,
+    #         "instructions": instructions,
+    #     },
+    # )
     
     return result
 
