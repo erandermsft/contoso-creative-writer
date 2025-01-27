@@ -12,6 +12,12 @@
   "__elements": {},
   "__requires": [
     {
+      "type": "panel",
+      "id": "bargauge",
+      "name": "Bar gauge",
+      "version": ""
+    },
+    {
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
@@ -750,39 +756,7 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 15,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "smooth",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": true,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "mode": "thresholds"
           },
           "mappings": [],
           "thresholds": {
@@ -810,22 +784,29 @@
       },
       "id": 66,
       "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "right",
-          "showLegend": true
+        "displayMode": "lcd",
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "text"
       },
+      "pluginVersion": "10.4.11",
       "targets": [
         {
           "azureLogAnalytics": {
             "dashboardTime": false,
-            "query": "dependencies\r\n| where $__timeFilter(timestamp)\r\n| extend model = tostring(customDimensions[\"gen_ai.response.model\"])\r\n| where model != \"\"\r\n| project timestamp, duration_sec=duration/1000, model\r\n| summarize duration_sec = avg(duration_sec) by bin(timestamp, 1m), model\r\n| evaluate pivot(model, avg(duration_sec))\r\n",
+            "query": "dependencies\r\n| where $__timeFilter(timestamp)\r\n| extend model = tostring(customDimensions[\"gen_ai.response.model\"])\r\n| where model != \"\"\r\n| project timestamp, duration_sec=duration/1000, model\r\n| summarize duration_sec = avg(duration_sec) by model\r\n| evaluate pivot(model, avg(duration_sec))\r\n",
             "resources": [
               "/subscriptions/$sub/resourceGroups/$rg/providers/Microsoft.Insights/components/$res"
             ],
@@ -840,7 +821,7 @@
         }
       ],
       "title": " Average Model Duration (Sec)",
-      "type": "timeseries"
+      "type": "bargauge"
     },
     {
       "datasource": {
@@ -1024,7 +1005,11 @@
               },
               {
                 "id": "custom.width",
-                "value": 300
+                "value": 501
+              },
+              {
+                "id": "unit",
+                "value": "ms"
               }
             ]
           },
@@ -1194,7 +1179,7 @@
         {
           "azureLogAnalytics": {
             "dashboardTime": false,
-            "query": "let minDuration = iif(isempty(\"$min_duration\"), \"0\", \"$min_duration\");\nlet maxDuration = iif(isempty(\"$max_duration\"), \"0\", \"$max_duration\");\n\nlet min_length_8 = (s: string) {\n    let len = strlen(s);\n    case(len == 1, strcat(s, s, s, s, s, s, s, s),\n        len == 2 or len == 3, strcat(s, s, s, s),\n        len == 4 or len == 5 or len == 6 or len == 7, strcat(s, s),\n        s)\n};\nlet ai_hash = (s: string) {\n    abs(toint(__hash_djb2(min_length_8(s))))\n};\nrequests\n//| where (\"All\" in ($operation_name) or operation_Name in ($operation_name))\n| where $__timeFilter(timestamp)\n| where customDimensions['http.method'] != 'OPTIONS'\n//| where duration >= todouble(minDuration) and duration <= todouble(maxDuration)\n| project Name = operation_Name, Time=timestamp, ResponseCode = resultCode, ResponseTime = duration, OperationID = operation_Id, Score=ai_hash(operation_Id)\n| top 20 by Score asc",
+            "query": "let minDuration = iif(isempty(\"$min_duration\"), \"0\", \"$min_duration\");\nlet maxDuration = iif(isempty(\"$max_duration\"), \"0\", \"$max_duration\");\n\nlet min_length_8 = (s: string) {\n    let len = strlen(s);\n    case(len == 1, strcat(s, s, s, s, s, s, s, s),\n        len == 2 or len == 3, strcat(s, s, s, s),\n        len == 4 or len == 5 or len == 6 or len == 7, strcat(s, s),\n        s)\n};\nlet ai_hash = (s: string) {\n    abs(toint(__hash_djb2(min_length_8(s))))\n};\nrequests\n//| where (\"All\" in ($operation_name) or operation_Name in ($operation_name))\n| where $__timeFilter(timestamp)\n| where operation_Name !startswith \"OPTIONS\"\n//| where duration >= todouble(minDuration) and duration <= todouble(maxDuration)\n| project Name = operation_Name, Time=timestamp, ResponseCode = resultCode, ResponseTime = duration, OperationID = operation_Id, Score=ai_hash(operation_Id)\n| top 20 by Score asc",
             "resources": [
               "/subscriptions/$sub/resourceGroups/$rg/providers/$ns/$res"
             ],
@@ -1361,6 +1346,6 @@
   "timezone": "",
   "title": "Azure / AI",
   "uid": "eea9zehfav4sgc",
-  "version": 23,
+  "version": 3,
   "weekStart": ""
 }
