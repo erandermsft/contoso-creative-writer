@@ -33,6 +33,7 @@ param bingName string
 @description('The Bing connection name.')
 param bingConnectionName string
 param tags object = {}
+param apimPrincipalId string
 
 module hubDependencies '../ai/hub-dependencies.bicep' = {
   name: 'hubDependencies'
@@ -49,6 +50,7 @@ module hubDependencies '../ai/hub-dependencies.bicep' = {
     openAiModelDeployments: openAiModelDeployments
     searchServiceName: searchServiceName
     bingName: bingName
+    apimPrincipalId: apimPrincipalId
   }
 }
 
@@ -102,6 +104,7 @@ output keyVaultEndpoint string = hubDependencies.outputs.keyVaultEndpoint
 
 // Application Insights
 output applicationInsightsName string = hubDependencies.outputs.applicationInsightsName
+output applicationInsightsId string = hubDependencies.outputs.applicationInsightsId
 output applicationInsightsConnectionString string = hubDependencies.outputs.applicationInsightsConnectionString
 output logAnalyticsWorkspaceName string = hubDependencies.outputs.logAnalyticsWorkspaceName
 

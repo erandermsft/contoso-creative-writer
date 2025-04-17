@@ -6,6 +6,8 @@ param tags object = {}
 param customSubDomainName string = name
 param deployments array = []
 param kind string = 'AIServices'
+param apimPrincipalId string
+param cognitiveServicesOpenAIUser string = '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
 
 @allowed([ 'Enabled', 'Disabled' ])
 param publicNetworkAccess string = 'Enabled'
@@ -47,6 +49,16 @@ resource deployment 'Microsoft.CognitiveServices/accounts/deployments@2023-05-01
     capacity: 8
   }
 }]
+
+resource csRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!empty(apimPrincipalId)) {
+  name: guid(account.id, cognitiveServicesOpenAIUser, apimPrincipalId)
+  scope: account
+  properties: {
+    roleDefinitionId: resourceId('Microsoft.Authorization/roleDefinitions', cognitiveServicesOpenAIUser)
+    principalId: apimPrincipalId
+    principalType: 'ServicePrincipal'
+  }
+}
 
 output endpoint string = account.properties.endpoint
 output endpoints object = account.properties.endpoints

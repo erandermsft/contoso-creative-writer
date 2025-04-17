@@ -21,10 +21,13 @@ param aiSearchIndexName string
 param appinsights_Connectionstring string
 param aiProjectName string
 param subscriptionId string
+param apimGatewayUrl string
+param bingApiEndpoint string
 
 @secure()
 param bingApiKey string
-param bingApiEndpoint string
+@secure()
+param apimSubscriptionKey string
 
 
 module app '../core/host/container-app-upsert.bicep' = {
@@ -39,6 +42,7 @@ module app '../core/host/container-app-upsert.bicep' = {
     containerRegistryName: containerRegistryName
     secrets: {
       'bing-search-key': bingApiKey
+      'apim-subscription-key': apimSubscriptionKey
     }
     env: [
       {
@@ -112,6 +116,14 @@ module app '../core/host/container-app-upsert.bicep' = {
       {
         name: 'BING_SEARCH_NAME'
         value: bingName
+      }
+      {
+        name: 'APIM_ENDPOINT'
+        value: apimGatewayUrl
+      }
+      {
+        name: 'APIM_SUBSCRIPTION_KEY'
+        secretRef: 'apim-subscription-key'
       }
     ]
     targetPort: 80

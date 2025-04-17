@@ -23,6 +23,7 @@ param searchServiceName string = ''
 param bingName string
 @description('Location of Bing service')
 param bingLocation string = 'global'
+param apimPrincipalId string
 
 module keyVault '../security/keyvault.bicep' = {
   name: 'keyvault'
@@ -146,6 +147,7 @@ module cognitiveServices '../ai/cognitiveservices.bicep' = {
     name: openAiName
     kind: 'AIServices'
     deployments: openAiModelDeployments
+    apimPrincipalId: apimPrincipalId
   }
 }
 

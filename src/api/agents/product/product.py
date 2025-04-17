@@ -23,18 +23,17 @@ AZURE_OPENAI_VERSION = os.getenv("AZURE_OPENAI_API_VERSION")
 AZURE_OPENAI_DEPLOYMENT = "text-embedding-ada-002"
 AZURE_AI_SEARCH_ENDPOINT = os.getenv("AI_SEARCH_ENDPOINT")
 AZURE_AI_SEARCH_INDEX = "contoso-products"
-
+APIM_ENDPOINT = os.getenv("APIM_ENDPOINT")
+APIM_SUBSCRIPTION_KEY = os.getenv("APIM_SUBSCRIPTION_KEY")
 
 @trace
 def generate_embeddings(queries: List[str]) -> str:
-    token_provider = get_bearer_token_provider(
-        DefaultAzureCredential(), "https://cognitiveservices.azure.com/.default"
-    )
+    # Remove token provider as we'll use subscription key instead
 
     client = AzureOpenAI(
-        azure_endpoint = f"https://{os.getenv('AZURE_OPENAI_NAME')}.cognitiveservices.azure.com/", 
+        azure_endpoint=APIM_ENDPOINT,
         api_version=os.environ["AZURE_OPENAI_API_VERSION"],
-        azure_ad_token_provider=token_provider
+        api_key=APIM_SUBSCRIPTION_KEY
     )
 
     embeddings = client.embeddings.create(input=queries, model="text-embedding-ada-002")

@@ -134,6 +134,7 @@ module ai 'core/host/ai-environment.bicep' = {
     searchConnectionName: !useSearch ? '' : !empty(searchConnectionName) ? searchConnectionName : 'search-service-connection'
     bingName: !empty(bingName) ? bingName : 'agent-bing-search'
     bingConnectionName: !empty(bingConnectionName) ? bingConnectionName : 'bing-connection'
+    apimPrincipalId: apim.outputs.apimPrincipalId
   }
 }
 
@@ -187,6 +188,8 @@ module apiContainerApp 'app/api.bicep' = {
     bingApiKey: ai.outputs.bingApiKey
     aiProjectName: ai.outputs.projectName
     subscriptionId: subscription().subscriptionId
+    apimGatewayUrl: apim.outputs.apimGatewayUrl
+    apimSubscriptionKey: openAIAPIModule.outputs.subscriptionPrimaryKey
   }
 }
 
@@ -202,6 +205,56 @@ module webContainerApp 'app/web.bicep' = {
     containerAppsEnvironmentName: containerApps.outputs.environmentName
     containerRegistryName: containerApps.outputs.registryName
     apiEndpoint: apiContainerApp.outputs.SERVICE_ACA_URI
+  }
+}
+
+module apim 'core/apim/apim.bicep' = {
+  name: 'apim'
+  scope: resourceGroup
+  params: {
+    name: 'apim-${resourceToken}'
+    location: location
+    tags: tags
+  }
+}
+
+module openAIAPIModule 'core/apim/openai-api.bicep' = {
+  name: 'openaiapi'
+  scope: resourceGroup
+  params: {
+    apiManagementName: apim.outputs.apimName
+    openAiName: ai.outputs.openAiName
+    openAiEndpoint: ai.outputs.openAiEndpoint
+  }
+}
+
+module apimDiagnostics 'core/apim/apim-diagnostics.bicep' = {
+  name: 'apim-diagnostics'
+  scope: resourceGroup
+  params: {
+    apimName: apim.outputs.apimName
+    applicationInsightsResourceId: ai.outputs.applicationInsightsId
+    applicationInsightsConnectionString: ai.outputs.applicationInsightsConnectionString
+  }
+}
+
+module apiToApimRole 'core/security/role.bicep' = {
+  name: 'api-to-apim-role'
+  scope: resourceGroup 
+  params: {
+    principalId: managedIdentity.outputs.managedIdentityPrincipalId 
+    roleDefinitionId: '312a565d-c81f-4fd8-895a-4e21e48d571c' // API Management Service Contributor
+    principalType: 'ServicePrincipal'
+  }
+}
+
+module apimAppInsightsRole 'core/security/role.bicep' = {
+  name: 'apim-appinsights-role'
+  scope: resourceGroup
+  params: {
+    principalId: apim.outputs.apimPrincipalId
+    roleDefinitionId: '3913510d-42f4-4e42-8a64-420c390055eb' // Monitoring Metrics Publisher
+    principalType: 'ServicePrincipal'
   }
 }
 
@@ -330,3 +383,8 @@ output AZURE_SEARCH_NAME string = ai.outputs.searchServiceName
 output BING_SEARCH_ENDPOINT string = ai.outputs.bingEndpoint
 output BING_SEARCH_NAME string = ai.outputs.bingName
 output BING_SEARCH_KEY string = ai.outputs.bingApiKey
+
+output APIM_NAME string = apim.outputs.apimName
+output APIM_ID string = apim.outputs.apimId
+output APIM_PRINCIPAL_ID string = apim.outputs.apimPrincipalId
+output APIM_GATEWAY_URL string = apim.outputs.apimGatewayUrl
