@@ -17,7 +17,7 @@ from agents.planner import planner
 from evaluate.evaluators import evaluate_article_in_background
 from prompty.tracer import trace, Tracer, console_tracer, PromptyTracer
 
-types = Literal["message", "researcher", "marketing", "designer","writer", "editor", "error", "partial", "publishing"]
+types = Literal["message", "researcher", "marketing", "designer","writer", "editor", "error", "partial", "publishing", "influencer"]
 
 class Message(BaseModel):
     type: types
@@ -173,6 +173,20 @@ def create(research_context, product_context, assignment_context, influencer_con
             article=full_result,
         )
     
+    # Send the article to the influencer
+    if influencer_context:
+        yield start_message("influencer")
+        influencer_response = influencer.influence(article=processed_writer_result['article'], customers=None, instructions=influencer_context)
+        influencer_response = json.loads(influencer_response)
+        if influencer_response is not None and "posts" in influencer_response:
+            influencer_response = influencer_response["posts"]
+        else:
+            influencer_response = "No influencer response"
+        yield complete_message("influencer", influencer_response)
+
+            
+            
+        
     yield start_message("publishing")
     publisher_result = asyncio.run(publisher.publish(full_result))
     yield complete_message("publishing", publisher_result)

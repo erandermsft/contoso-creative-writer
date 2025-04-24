@@ -13,8 +13,8 @@ model:
   parameters:
         max_tokens: 1200
         temperature: 0.2
-        # response_format:
-        #   type: json_object
+        response_format:
+          type: json_object
 sample:
   customers: ${file:customers.json}
   article: ${file:article.txt}
@@ -61,6 +61,6 @@ Use the following article as context
 {{instructions}}
 
 # Output format
-Only output the full array of social media posts. Its important that the output is a JSON array.
-The scoial media post should just contain to keys, customer and socialMediaPost, nothing else.
+Only output the full array of social media posts. Its important that the output is a single JSON object with one key "posts".
+Each post should should only contain two keys, customer and socialMediaPost, nothing else.
 

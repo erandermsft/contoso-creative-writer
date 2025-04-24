@@ -11,6 +11,8 @@ model:
     api_version: 2024-08-01-preview
   parameters:
     max_tokens: 1500
+    response_format:
+      type: json_object
 sample:
   context: Can you use a selection of sports and outdoor cooking gear as context?
 ---
@@ -45,7 +47,6 @@ to generate the queries.
 
 # Output format
 Only output the full array of specialized queries to make to the search index. Limit
-yoursef to 5 queries.
-
+yoursef to 5 queries. Respond with a JSON array of strings, the key should always be "queries".
 user:
 {{context}}

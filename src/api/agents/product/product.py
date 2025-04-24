@@ -23,7 +23,7 @@ AZURE_OPENAI_VERSION = os.getenv("AZURE_OPENAI_API_VERSION")
 AZURE_OPENAI_DEPLOYMENT = "text-embedding-ada-002"
 AZURE_AI_SEARCH_ENDPOINT = os.getenv("AI_SEARCH_ENDPOINT")
 AZURE_AI_SEARCH_INDEX = "contoso-products"
-APIM_ENDPOINT = os.getenv("APIM_GATEWAY_URL")
+APIM_ENDPOINT = os.getenv("APIM_ENDPOINT")
 APIM_SUBSCRIPTION_KEY = os.getenv("APIM_SUBSCRIPTION_KEY")
 
 @trace
@@ -88,9 +88,13 @@ def find_products(context: str) -> Dict[str, any]:
     print("Finding products...")
     # Get product queries
     queries = prompty.execute("product.prompty", inputs={"context":context})
+    # load dictionary
     qs = json.loads(queries)
-    # Generate embeddings
-    items = generate_embeddings(qs)
+    # Check if the queries are empty
+    if not qs or "queries" not in qs:
+        print("No queries found.")
+        return []
+    items = generate_embeddings(qs["queries"])
     # Retrieve products
     products = retrieve_products(items, "contoso-products")
 

@@ -396,4 +396,5 @@ output BING_SEARCH_KEY string = ai.outputs.bingApiKey
 output APIM_NAME string = apim.outputs.apimName
 output APIM_ID string = apim.outputs.apimId
 output APIM_PRINCIPAL_ID string = apim.outputs.apimPrincipalId
-output APIM_GATEWAY_URL string = apim.outputs.apimGatewayUrl
+output APIM_ENDPOINT string = apim.outputs.apimGatewayUrl
+output APIM_SUBSCRIPTION_KEY string = openAIAPIModule.outputs.subscriptionPrimaryKey
