@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Text.Encodings.Web;
 using McpPublishingToolServer.Messaging;
 using ModelContextProtocol.Server;
 
@@ -12,8 +11,8 @@ public sealed class ArticlePublishingTool
     public static async Task<string> PublishArticle(
         ServiceBusArticleEventSender eventSender,
         ILogger<ArticlePublishingTool> logger,
-        [Description("The article")]
-        string article)
+        [Description("The article")] string article,
+        CancellationToken cancellationToken)
     {
         logger.LogInformation("Publishing article {Article}", article);
 
@@ -25,11 +24,11 @@ public sealed class ArticlePublishingTool
                 ArticleContent = article,
                 PublishTime = DateTimeOffset.UtcNow
             };
-
+        
             await eventSender.SendAsync(articleEvent);
-
+        
             logger.LogInformation("Article published successfully");
-
+        
             return "Published successfully at " + articleEvent.PublishTime.ToString("s");
         }
         catch (Exception e)

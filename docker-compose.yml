@@ -7,7 +7,7 @@ services:
     env_file:
       - .env
     environment:
-      - SERILOG__MINIMUMLEVEL=Verbose
+      - SERILOG__MINIMUMLEVEL=Information
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://dashboard:18889
       - OTEL_SERVICE_NAME=mcp-server
   api:

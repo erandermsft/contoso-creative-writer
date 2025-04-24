@@ -3,6 +3,7 @@ import json
 from typing import Dict, List
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from prompty.tracer import trace
+from opentelemetry import trace as oteltrace
 import prompty
 import prompty.azure
 from openai import AzureOpenAI
@@ -29,11 +30,18 @@ APIM_SUBSCRIPTION_KEY = os.getenv("APIM_SUBSCRIPTION_KEY")
 @trace
 def generate_embeddings(queries: List[str]) -> str:
     # Remove token provider as we'll use subscription key instead
+    ctx = oteltrace.get_current_span().get_span_context()
+
+    traceparent = f"00-{'{trace:032x}'.format(trace=ctx.trace_id)}-{'{span:016x}'.format(span=ctx.span_id)}-01"
+    print(traceparent)
 
     client = AzureOpenAI(
         azure_endpoint=APIM_ENDPOINT,
         api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
-        api_key=APIM_SUBSCRIPTION_KEY
+        api_key=APIM_SUBSCRIPTION_KEY,
+        default_headers={
+            "traceparent": traceparent
+        }
     )
 
     embeddings = client.embeddings.create(input=queries, model="text-embedding-ada-002")

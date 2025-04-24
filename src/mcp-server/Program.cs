@@ -1,7 +1,7 @@
 using Azure.Identity;
+using Azure.Monitor.OpenTelemetry.Exporter;
 using McpPublishingToolServer.Messaging;
 using McpPublishingToolServer.Tools;
-using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Serilog;
@@ -25,19 +25,32 @@ builder.Host.UseSerilog((context, configuration) =>
 // Service Bus Configuration
 builder.AddAzureServiceBusClient("publishing_fullyQualifiedNamespace", settings => settings.Credential
     = new ChainedTokenCredential(
-        new ManagedIdentityCredential(), 
-        new ClientSecretCredential(builder.Configuration["AZURE_TENANT_ID"], builder.Configuration["AZURE_CLIENT_ID"], builder.Configuration["AZURE_CLIENT_SECRET"])));
-builder.Services.AddSingleton<ServiceBusArticleEventSender>();
+        new ClientSecretCredential(builder.Configuration["AZURE_TENANT_ID"], builder.Configuration["AZURE_CLIENT_ID"], builder.Configuration["AZURE_CLIENT_SECRET"]),
+        new ManagedIdentityCredential()));
+builder.Services.AddScoped<ServiceBusArticleEventSender>();
 
 // OpenTelemetry Configuration
 builder.Services.AddOpenTelemetry()
-    .WithTracing(b => b.AddSource("*")
+    .WithTracing(tracerProviderBuilder =>
+    {
+        tracerProviderBuilder
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation();
+
+        var connectionString = builder.Configuration["APPINSIGHTS_CONNECTIONSTRING"] ?? builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
+        if (connectionString != null)
+        {
+            tracerProviderBuilder.AddAzureMonitorTraceExporter(options =>
+            {
+                options.ConnectionString = connectionString;
+            });
+        }
+        tracerProviderBuilder.AddOtlpExporter();
+    })
+    .WithMetrics(b => b
         .AddAspNetCoreInstrumentation()
-        .AddHttpClientInstrumentation())
-    .WithMetrics(b => b.AddMeter("*")
-        .AddAspNetCoreInstrumentation()
-        .AddHttpClientInstrumentation())
-    .UseOtlpExporter();
+        .AddHttpClientInstrumentation()
+        .AddOtlpExporter());
 
 // MCP Configuration
 builder.Services.AddMcpServer().WithHttpTransport()
@@ -47,16 +60,4 @@ var app = builder.Build();
 
 app.MapMcp();
 
-app.MapGet("testing", async (ServiceBusArticleEventSender sender) =>
-{
-    // This is just a test to send an event to the Service Bus
-    var articleEvent = new ArticlePublishingEvent
-    {
-        ArticleId = Guid.NewGuid().ToString(),
-        ArticleContent = "Test content",
-        PublishTime = DateTimeOffset.UtcNow
-    };
-    await sender.SendAsync(articleEvent);
-    return Results.Ok();
-});
 app.Run();
