@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 
 
-from openai import AzureOpenAI
+from openai import AzureOpenAI, AsyncAzureOpenAI
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 
 from semantic_kernel import Kernel
@@ -16,6 +16,7 @@ from semantic_kernel.connectors.mcp import MCPSsePlugin, MCPWebsocketPlugin
 from semantic_kernel.contents import ChatHistory
 from semantic_kernel.utils.logging import setup_logging
 
+from opentelemetry import trace as oteltrace
 from prompty.tracer import trace
 import mcp
 from mcp import types
@@ -32,11 +33,13 @@ You output everything in JSON format. Here is an example:
 
 Given an article you can respond as follows.
 
-If the article is good enough to be published, you should call the tool for publish and then respond with:
+If the article is good enough to be published, you should call the tool for publish.
+
+The following is examples of the JSON you should return:
 
 {
   "decision": "publish",
-  "publisherFeedback": "The article is well-written and informative. It meets our publication standards. The article has been published successfully at time 2024-05-01T20:23:10.",
+  "publisherFeedback": "The article is well-written and informative. It meets our publication standards."
 }
 
 or if the article needs work or contains information that is not good to publish you reject the publish:
@@ -48,7 +51,7 @@ or if the article needs work or contains information that is not good to publish
 You should only **publish** or **reject** the article if you are sure about your decision.
 It is **important** to **always** call the tool to publish the article if you decide to **publish** it.
 You should also provide a response to the article if you publish it and suggest a response if you reject it in the
-**publisherFeedback** field. 
+**publisherFeedback** field. **always** include the tool call in the **publisherFeedback** field if you decide to publish the article.
 """
 
 input = """
@@ -61,7 +64,7 @@ async def publish(article):
 
     print('starting publishing article')
 
-    result = await publish_article_sdk(article)
+    result = await publish_article_sk(article)
 
     print('publishing article successfully completed')
 
@@ -102,7 +105,7 @@ async def publish_article_sdk(article):
             DefaultAzureCredential(), "https://cognitiveservices.azure.com/.default"
         )
 
-        client = AzureOpenAI(
+        client = AsyncAzureOpenAI(
             azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
             api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
             azure_ad_token_provider=token_provider,
@@ -122,7 +125,7 @@ async def publish_article_sdk(article):
             }
         ]
 
-        response = client.chat.completions.create(
+        response = await client.chat.completions.create(
             model=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
             messages=messages,
             tools=openai_tools,
@@ -141,7 +144,6 @@ async def publish_article_sdk(article):
                 print(f"Tool call ID: {tool_call.id}")
                 print(f"Tool call function: {tool_call.function.name}")
                 print(f"Tool call arguments: {function_args}")
-                # Call the tool with the provided arguments
                 result = await session.call_tool(tool_call.function.name, function_args)
                 print(f"Tool call result: {result}")
                 messages.append({
@@ -154,7 +156,7 @@ async def publish_article_sdk(article):
             json_r = json.loads(response_message.content)
             return json_r
         
-        final_response = client.chat.completions.create(
+        final_response = await client.chat.completions.create(
             model=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
             messages=messages,
             tools=openai_tools,
@@ -186,22 +188,30 @@ async def publish_article_sk(article):
 
     kernel = Kernel()
 
-    token_provider = get_bearer_token_provider(
-        DefaultAzureCredential(), "https://cognitiveservices.azure.com/.default"
-    )
+    # token_provider = get_bearer_token_provider(
+    #     DefaultAzureCredential(), "https://cognitiveservices.azure.com/.default"
+    # )
+
+    ctx = oteltrace.get_current_span().get_span_context()
+
+    traceparent = f"00-{'{trace:032x}'.format(trace=ctx.trace_id)}-{'{span:016x}'.format(span=ctx.span_id)}-01"
 
     chat_completion = AzureChatCompletion(
         deployment_name=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
-        ad_token_provider=token_provider,
+        #ad_token_provider=token_provider,
         api_version="2024-12-01-preview",
-        endpoint=os.getenv("AZURE_OPENAI_ENDPOINT")
+        api_key=os.getenv("APIM_SUBSCRIPTION_KEY"),
+        endpoint=os.getenv("APIM_GATEWAY_URL"),
+        default_headers={
+            "traceparent": traceparent
+        }
     )
 
     kernel.add_service(chat_completion)
     
     request_settings = AzureChatPromptExecutionSettings(
         temperature=1,
-        max_tokens=1200,
+        max_tokens=4000,
         function_choice_behavior=FunctionChoiceBehavior.Auto(),
         response_format={ "type": "json_object" },
         #tool_choice="auto"
@@ -210,6 +220,9 @@ async def publish_article_sk(article):
     mcpPlugin = MCPSsePlugin(
             name="PublisherTools",
             url=os.getenv("MCP_SERVER_URL") + "/sse",
+            headers={
+                "traceparent": traceparent
+            },
         )
     
     await mcpPlugin.connect()

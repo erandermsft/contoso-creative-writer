@@ -99,6 +99,8 @@ def execute_research(instructions: str, feedback: str = "No feedback"):
             wait=wait_exponential(multiplier=1, min=4, max=60),
             stop=stop_after_attempt(10)
         )
+        
+        @trace
         def run_agent():
         # Create and process agent run in thread with tools
             run = project_client.agents.create_and_process_run(thread_id=thread.id, agent_id=agent.id)
