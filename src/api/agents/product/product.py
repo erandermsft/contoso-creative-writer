@@ -23,7 +23,7 @@ AZURE_OPENAI_VERSION = os.getenv("AZURE_OPENAI_API_VERSION")
 AZURE_OPENAI_DEPLOYMENT = "text-embedding-ada-002"
 AZURE_AI_SEARCH_ENDPOINT = os.getenv("AI_SEARCH_ENDPOINT")
 AZURE_AI_SEARCH_INDEX = "contoso-products"
-APIM_ENDPOINT = os.getenv("APIM_ENDPOINT")
+APIM_ENDPOINT = os.getenv("APIM_GATEWAY_URL")
 APIM_SUBSCRIPTION_KEY = os.getenv("APIM_SUBSCRIPTION_KEY")
 
 @trace
@@ -32,7 +32,7 @@ def generate_embeddings(queries: List[str]) -> str:
 
     client = AzureOpenAI(
         azure_endpoint=APIM_ENDPOINT,
-        api_version=os.environ["AZURE_OPENAI_API_VERSION"],
+        api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
         api_key=APIM_SUBSCRIPTION_KEY
     )
 
@@ -84,6 +84,8 @@ def retrieve_products(items: List[Dict[str, any]], index_name: str) -> str:
 
 @trace
 def find_products(context: str) -> Dict[str, any]:
+
+    print("Finding products...")
     # Get product queries
     queries = prompty.execute("product.prompty", inputs={"context":context})
     qs = json.loads(queries)
@@ -91,6 +93,14 @@ def find_products(context: str) -> Dict[str, any]:
     items = generate_embeddings(qs)
     # Retrieve products
     products = retrieve_products(items, "contoso-products")
+
+    print("Products found:")
+    for product in products:
+        print(f"Product ID: {product['id']}")
+        print(f"Title: {product['title']}")
+        print(f"Content: {product['content']}")
+        print(f"URL: {product['url']}")
+        print()
     return products
 
 

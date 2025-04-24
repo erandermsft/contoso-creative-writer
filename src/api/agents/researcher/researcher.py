@@ -47,6 +47,11 @@ def execute_research(instructions: str, feedback: str = "No feedback"):
     feedback= feedback
     messages = prompt_template.create_messages(instructions=instructions, feedback=feedback)
 
+    print(f"Instructions: {instructions}")
+    print(f"Feedback: {feedback}")
+    print(f"Messages: {messages}")
+
+
     bing_connection = project_client.connections.get(
         connection_name='bing-connection'
     )
@@ -96,7 +101,7 @@ def execute_research(instructions: str, feedback: str = "No feedback"):
         )
         def run_agent():
         # Create and process agent run in thread with tools
-            run = project_client.agents.create_and_process_run(thread_id=thread.id, assistant_id=agent.id)
+            run = project_client.agents.create_and_process_run(thread_id=thread.id, agent_id=agent.id)
             print(f"Run finished with status: {run.status}")
             return run
         
@@ -114,8 +119,9 @@ def execute_research(instructions: str, feedback: str = "No feedback"):
 
         # Fetch and log all messages
         messages = project_client.agents.list_messages(thread_id=thread.id)
-        # print(f"Messages: {messages}")
+        print(f"Messages: {messages}")
         research_response = messages.data[0]['content'][0]['text']['value']
+        print(f"Research response: {research_response}")
         try: 
             json_r = json.loads(research_response)
         except:

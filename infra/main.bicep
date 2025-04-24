@@ -161,6 +161,15 @@ module containerApps 'core/host/container-apps.bicep' = {
   }
 }
 
+module serviceBus 'core/integration/servicebus.bicep' = {
+  name: 'servicebus'
+  scope: resourceGroup
+  params: {
+    location: location
+    name: 'sb${resourceToken}'
+  }
+}
+
 module apiContainerApp 'app/api.bicep' = {
   name: 'api'
   scope: resourceGroup

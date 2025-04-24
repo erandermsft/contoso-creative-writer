@@ -3,17 +3,19 @@ from prompty.tracer import trace
 from pydantic import BaseModel, Field
 import logging
 import json
+import asyncio
 
 # agents
 from agents.researcher import researcher
 from agents.product import product
 from agents.writer import writer
+from agents.publisher import publisher
 # from agents.designer import designer
 from agents.editor import editor
 from evaluate.evaluators import evaluate_article_in_background
 from prompty.tracer import trace, Tracer, console_tracer, PromptyTracer
 
-types = Literal["message", "researcher", "marketing", "designer","writer", "editor", "error", "partial", ]
+types = Literal["message", "researcher", "marketing", "designer","writer", "editor", "error", "partial", "publishing"]
 
 class Message(BaseModel):
     type: types
@@ -143,12 +145,12 @@ def create(research_context, product_context, assignment_context, evaluate=False
         yield complete_message("editor", editor_response)
         yield complete_message("writer", {"complete": True})
 
-    #these need to be yielded for calling evals from evaluate.evaluate
-    yield send_research(research_result)
-    yield send_products(product_result)
-    yield send_writer(full_result) 
 
     if evaluate:
+        #these need to be yielded for calling evals from evaluate.evaluate
+        yield send_research(research_result)
+        yield send_products(product_result)
+        yield send_writer(full_result) 
         print("Evaluating article...")
         evaluate_article_in_background(
             research_context=research_context,
@@ -158,6 +160,11 @@ def create(research_context, product_context, assignment_context, evaluate=False
             products=product_result,
             article=full_result,
         )
+    
+    yield start_message("publishing")
+    publisher_result = asyncio.run(publisher.publish(full_result))
+    yield complete_message("publishing", publisher_result)
+
 
 @trace  
 def test_create_article(research_context, product_context, assignment_context):

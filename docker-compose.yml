@@ -1,17 +1,44 @@
 services:
+  mcp-server:
+    build:
+      context: src/mcp-server
+    ports:
+      - 5000:8080
+    env_file:
+      - .env
+    environment:
+      - SERILOG__MINIMUMLEVEL=Verbose
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://dashboard:18889
+      - OTEL_SERVICE_NAME=mcp-server
   api:
     build:
-      context: src/api
+      context: src/api 
     ports:
-      - "5000:5000"
+      - 8000:80
     env_file: 
       - .env
     environment:
       - PYTHONUNBUFFERED=1
+      # - OTEL_EXPORTER_OTLP_ENDPOINT="http://dashboard:18889"
+      # - OTEL_SERVICE_NAME=agent-api
+      - OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT=true
+      - AZURE_TRACING_GEN_AI_CONTENT_RECORDING_ENABLED=true
+      # - LOCAL_TRACING=true
+      - MCP_SERVER_URL=http://mcp-server:8080
   web:
     build:
       context: src/web
     ports:
-      - "3000:80"
+      - 3000:80
+    environment:
+      - API_ENDPOINT=http://api:80
     depends_on:
       - api
+
+  dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:9.0
+    ports:
+      - 18888:18888
+      - 4317:18889
+    environment:
+      - DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=true

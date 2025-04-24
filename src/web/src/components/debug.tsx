@@ -3,6 +3,7 @@ import {
   ArrowPathIcon,
   BugAntIcon,
   BuildingStorefrontIcon,
+  DocumentArrowUpIcon,
   BeakerIcon,
   AcademicCapIcon,
   UserIcon,
@@ -52,6 +53,8 @@ export const Debug = () => {
         return "bg-violet-200 text-zinc-600";
       case "editor":
         return "bg-amber-200 text-zinc-600";
+      case "publishing":
+        return "bg-sky-200 text-zinc-600";
       case "error":
         return "bg-red-200 text-zinc-600";
       default:
@@ -69,8 +72,10 @@ export const Debug = () => {
         return <AcademicCapIcon className="w-6 stroke-green-600" />;
       case "writer":
         return <UserIcon className="w-6 stroke-violet-600" />;
-        case "editor":
-          return <PencilIcon className="w-6 stroke-amber-600" />;
+      case "editor":
+        return <PencilIcon className="w-6 stroke-amber-600" />;
+      case "publishing":
+        return <DocumentArrowUpIcon className="w-6 stroke-sky-600" />;
       case "error":
         return <BugAntIcon className="w-6 stroke-red-600" />;
       default:
