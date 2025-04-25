@@ -125,6 +125,10 @@ module app '../core/host/container-app-upsert.bicep' = {
         name: 'APIM_SUBSCRIPTION_KEY'
         secretRef: 'apim-subscription-key'
       }
+      {
+        name: 'MCP_SERVER_URL'
+        value: 'http://mcp-server:8080'
+      }
     ]
     targetPort: 80
   }

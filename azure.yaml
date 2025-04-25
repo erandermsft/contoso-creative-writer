@@ -14,6 +14,12 @@ services:
     host: containerapp
     docker:
       remoteBuild: true
+  mcp-server:
+    project: ./src/mcp-server
+    language: dotnet
+    host: containerapp
+    docker:
+      remoteBuild: true
 hooks:
   postprovision:
     posix:

@@ -217,6 +217,21 @@ module webContainerApp 'app/web.bicep' = {
   }
 }
 
+module mcpServerApp 'app/mcp-server.bicep' = {
+  name: 'mcp-server'
+  scope: resourceGroup
+  params: {
+    name: 'mcp-server'
+    location: location
+    tags: tags
+    identityName: managedIdentity.outputs.managedIdentityName
+    identityId: managedIdentity.outputs.managedIdentityClientId
+    containerAppsEnvironmentName: containerApps.outputs.environmentName
+    containerRegistryName: containerApps.outputs.registryName
+    serviceBusName: serviceBus.outputs.name
+  }
+}
+
 module apim 'core/apim/apim.bicep' = {
   name: 'apim'
   scope: resourceGroup
@@ -343,6 +358,16 @@ module searchSvcContribRoleUser 'core/security/role.bicep' = {
   params: {
     principalId: principalId
     roleDefinitionId: '7ca78c08-252a-4471-8644-bb5ff32d4ba0'
+    principalType: principalType
+  }
+}
+
+module servicebusSender 'core/security/role.bicep' = {
+  scope: resourceGroup
+  name: 'servicebus-sender'
+  params: {
+    principalId: principalId
+    roleDefinitionId: '69a216fc-b8fb-44d8-bc22-1f3c2cd27a39'
     principalType: principalType
   }
 }
