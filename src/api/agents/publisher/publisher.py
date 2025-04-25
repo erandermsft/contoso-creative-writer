@@ -201,7 +201,7 @@ async def publish_article_sk(article):
         #ad_token_provider=token_provider,
         api_version="2024-12-01-preview",
         api_key=os.getenv("APIM_SUBSCRIPTION_KEY"),
-        endpoint=os.getenv("APIM_GATEWAY_URL"),
+        endpoint=os.getenv("APIM_ENDPOINT"),
         default_headers={
             "traceparent": traceparent
         }
