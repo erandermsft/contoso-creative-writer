@@ -127,7 +127,7 @@ module app '../core/host/container-app-upsert.bicep' = {
       }
       {
         name: 'MCP_SERVER_URL'
-        value: 'http://mcp-server:8080'
+        value: 'http://mcp-server'
       }
     ]
     targetPort: 80

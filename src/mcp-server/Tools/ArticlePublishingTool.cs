@@ -25,7 +25,7 @@ public sealed class ArticlePublishingTool
                 PublishTime = DateTimeOffset.UtcNow
             };
         
-            await eventSender.SendAsync(articleEvent);
+            await eventSender.SendAsync(articleEvent, cancellationToken);
         
             logger.LogInformation("Article published successfully");
         

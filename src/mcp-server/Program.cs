@@ -23,10 +23,25 @@ builder.Host.UseSerilog((context, configuration) =>
 });
 
 // Service Bus Configuration
-builder.AddAzureServiceBusClient("publishing_fullyQualifiedNamespace", settings => settings.Credential
-    = new ChainedTokenCredential(
-        new ClientSecretCredential(builder.Configuration["AZURE_TENANT_ID"], builder.Configuration["AZURE_CLIENT_ID"], builder.Configuration["AZURE_CLIENT_SECRET"]),
-        new ManagedIdentityCredential()));
+builder.AddAzureServiceBusClient("publishing_fullyQualifiedNamespace", settings =>
+{
+    if (builder.Configuration["AZURE_CLIENT_ID"] != null)
+    {
+        if (builder.Configuration["AZURE_TENANT_ID"] == null ||
+            builder.Configuration["AZURE_CLIENT_SECRET"] == null)
+        {
+            settings.Credential = new ManagedIdentityCredential(ManagedIdentityId.FromUserAssignedClientId(builder.Configuration["AZURE_CLIENT_ID"]));
+        }
+        else
+        {
+            settings.Credential = new ClientSecretCredential(builder.Configuration["AZURE_TENANT_ID"], builder.Configuration["AZURE_CLIENT_ID"], builder.Configuration["AZURE_CLIENT_SECRET"]);
+        }
+    }
+    else
+    {
+        settings.Credential = new DefaultAzureCredential();
+    }
+});
 builder.Services.AddScoped<ServiceBusArticleEventSender>();
 
 // OpenTelemetry Configuration
@@ -59,5 +74,16 @@ builder.Services.AddMcpServer().WithHttpTransport()
 var app = builder.Build();
 
 app.MapMcp();
+
+app.MapGet("testing", async (ServiceBusArticleEventSender sender) =>
+{
+    await sender.SendAsync(new ArticlePublishingEvent
+    {
+        ArticleId = "12345",
+        ArticleContent = "Test Article",
+        PublishTime = DateTimeOffset.UtcNow
+    });
+    return Results.Ok();
+});
 
 app.Run();

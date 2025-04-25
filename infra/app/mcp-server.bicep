@@ -29,7 +29,7 @@ module app '../core/host/container-app-upsert.bicep' = {
         value: '${serviceBusName}.servicebus.windows.net'
       }
     ]
-    targetPort: 80
+    targetPort: 8080
     external: false
   }
 }

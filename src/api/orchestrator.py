@@ -184,9 +184,6 @@ def create(research_context, product_context, assignment_context, influencer_con
             influencer_response = "No influencer response"
         yield complete_message("influencer", influencer_response)
 
-            
-            
-        
     yield start_message("publishing")
     publisher_result = asyncio.run(publisher.publish(full_result))
     yield complete_message("publishing", publisher_result)

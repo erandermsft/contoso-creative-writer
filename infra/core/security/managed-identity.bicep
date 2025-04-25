@@ -21,6 +21,16 @@ resource cognitiveServicesUserRoleAssignment 'Microsoft.Authorization/roleAssign
   }
 }
 
+module servicebusSender 'role.bicep' = {
+  scope: resourceGroup()
+  name: 'servicebus-sender-managed-identity'
+  params: {
+    principalId: managedIdentity.properties.principalId
+    roleDefinitionId: '69a216fc-b8fb-44d8-bc22-1f3c2cd27a39'
+    principalType: 'ServicePrincipal'
+  }
+}
+
 output managedIdentityName string = managedIdentity.name
 output managedIdentityClientId string = managedIdentity.properties.clientId
 output managedIdentityPrincipalId string = managedIdentity.properties.principalId

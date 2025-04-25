@@ -1,6 +1,6 @@
 import { githubDevSubsPort } from "../utils/ghutils";
 export interface IMessage {
-  type: "message" | "researcher" | "marketing" | "writer" | "editor" | "error" | "partial" | "influencer";
+  type: "message" | "researcher" | "marketing" | "writer" | "publishing" | "editor" | "error" | "partial" | "influencer";
   message: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data?: any;
@@ -141,7 +141,7 @@ export const startWritingTask = (
             }
           }else if(message.type === "influencer") {
             console.log('creating social media posts');
-            createSocialMediaPosts(JSON.parse(message.data?.posts) || []);
+            createSocialMediaPosts(<Array<ISocialMediaPost>>message.data || []);
           }
            else if (message.type === "partial") {
             if (message.data?.text && message.data.text.length > 0) {
