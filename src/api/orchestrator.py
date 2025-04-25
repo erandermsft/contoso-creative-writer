@@ -12,10 +12,12 @@ from agents.writer import writer
 from agents.publisher import publisher
 # from agents.designer import designer
 from agents.editor import editor
+from agents.influencer import influencer
+from agents.planner import planner
 from evaluate.evaluators import evaluate_article_in_background
 from prompty.tracer import trace, Tracer, console_tracer, PromptyTracer
 
-types = Literal["message", "researcher", "marketing", "designer","writer", "editor", "error", "partial", "publishing"]
+types = Literal["message", "researcher", "marketing", "designer","writer", "editor", "error", "partial", "publishing", "influencer"]
 
 class Message(BaseModel):
     type: types
@@ -25,11 +27,14 @@ class Message(BaseModel):
     def to_json_line(self):
         return self.model_dump_json().replace("\n", "") + "\n"
 
+class Goal(BaseModel):
+    goal: str
 
 class Task(BaseModel):
     research: str 
     products: str 
-    assignment: str 
+    assignment: str
+    influence: str 
 
 DEFAULT_LOG_LEVEL = 25
 
@@ -68,7 +73,14 @@ def building_agents_message():
     ).to_json_line()
 
 @trace
-def create(research_context, product_context, assignment_context, evaluate=False):
+def plan(goal):
+    # yield start_message("planner")
+    plan_result = planner.plan(goal)
+    return plan_result
+    # yield complete_message("researcher", plan_result)
+
+@trace
+def create(research_context, product_context, assignment_context, influencer_context=None, evaluate=False):
     
     feedback = "No Feedback"
 
@@ -161,6 +173,20 @@ def create(research_context, product_context, assignment_context, evaluate=False
             article=full_result,
         )
     
+    # Send the article to the influencer
+    if influencer_context:
+        yield start_message("influencer")
+        influencer_response = influencer.influence(article=processed_writer_result['article'], customers=None, instructions=influencer_context)
+        influencer_response = json.loads(influencer_response)
+        if influencer_response is not None and "posts" in influencer_response:
+            influencer_response = influencer_response["posts"]
+        else:
+            influencer_response = "No influencer response"
+        yield complete_message("influencer", influencer_response)
+
+            
+            
+        
     yield start_message("publishing")
     publisher_result = asyncio.run(publisher.publish(full_result))
     yield complete_message("publishing", publisher_result)

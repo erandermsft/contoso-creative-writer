@@ -1,0 +1,18 @@
+[
+    {
+        "Type": "Research Agent",
+        "Description": "This agent is responsible for searching the web and finding relevant information, trends, insights related to outdoor equipment"
+    },
+    {
+        "Type": "Products Agent",
+        "Description": "This agent is repsonsible for searching the product catalog and finding relevant products related to what the research agent found"
+    },
+    {
+        "Type": "Assignment Agent",
+        "Description": "This agent is responsible for writing articles, blog posts, and other content based on the information found by the Research and Product Research Agents"
+    },
+    {
+        "Type": "Influencer Agent",
+        "Description": "This agent uses the article provided and writes a social media post to promote the product, tailored to our customers"
+    }
+]
