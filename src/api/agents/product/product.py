@@ -3,12 +3,9 @@ import json
 from typing import Dict, List
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from prompty.tracer import trace
-from opentelemetry import trace as oteltrace
-import prompty
-import prompty.azure
 from openai import AzureOpenAI
 from dotenv import load_dotenv
-from pathlib import Path
+from azure.ai.inference.prompts import PromptTemplate
 from azure.search.documents import SearchClient
 from azure.search.documents.models import (
     VectorizedQuery,
@@ -29,19 +26,11 @@ APIM_SUBSCRIPTION_KEY = os.getenv("APIM_SUBSCRIPTION_KEY")
 
 @trace
 def generate_embeddings(queries: List[str]) -> str:
-    # Remove token provider as we'll use subscription key instead
-    ctx = oteltrace.get_current_span().get_span_context()
-
-    traceparent = f"00-{'{trace:032x}'.format(trace=ctx.trace_id)}-{'{span:016x}'.format(span=ctx.span_id)}-01"
-    print(traceparent)
 
     client = AzureOpenAI(
         azure_endpoint=APIM_ENDPOINT,
-        api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
-        api_key=APIM_SUBSCRIPTION_KEY,
-        default_headers={
-            "traceparent": traceparent
-        }
+        api_version=AZURE_OPENAI_VERSION,
+        api_key=APIM_SUBSCRIPTION_KEY
     )
 
     embeddings = client.embeddings.create(input=queries, model="text-embedding-ada-002")
@@ -94,15 +83,30 @@ def retrieve_products(items: List[Dict[str, any]], index_name: str) -> str:
 def find_products(context: str) -> Dict[str, any]:
 
     print("Finding products...")
+    
+    client = AzureOpenAI(
+        azure_endpoint=APIM_ENDPOINT,
+        api_version=AZURE_OPENAI_VERSION,
+        api_key=APIM_SUBSCRIPTION_KEY
+    )
+    
+    prompt_template = PromptTemplate.from_prompty(file_path="product.prompty")
+
+    messages = prompt_template.create_messages(context=context)
+
     # Get product queries
-    queries = prompty.execute("product.prompty", inputs={"context":context})
-    # load dictionary
+    response = client.chat.completions.create(
+        model=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
+        messages=messages,
+        max_tokens=prompt_template.parameters["max_tokens"],
+        response_format=prompt_template.parameters["response_format"],
+    )
+    queries = response.choices[0].message.content
+
     qs = json.loads(queries)
-    # Check if the queries are empty
-    if not qs or "queries" not in qs:
-        print("No queries found.")
-        return []
-    items = generate_embeddings(qs["queries"])
+    print(f"Queries: {qs}")
+    # Generate embeddings
+    items = generate_embeddings(qs['queries'])
     # Retrieve products
     products = retrieve_products(items, "contoso-products")
 

@@ -70,6 +70,9 @@ param openAi_4_DeploymentName string = 'gpt-4'
 @description('The name of the 4 eval OpenAI deployment')
 param openAi_4_eval_DeploymentName string = 'gpt-4-evals'
 
+@description('The name of the o3 mini OpenAI deployment')
+param openAi_o3_mini_DeploymentName string = 'o3-mini'
+
 @description('The name of the OpenAI embedding deployment')
 param openAiEmbeddingDeploymentName string = 'text-embedding-ada-002'
 
@@ -158,6 +161,7 @@ module containerApps 'core/host/container-apps.bicep' = {
     containerAppsEnvironmentName: 'agent-ca-env'
     containerRegistryName: ai.outputs.containerRegistryName
     logAnalyticsWorkspaceName: ai.outputs.logAnalyticsWorkspaceName
+    applicationInsightsName: ai.outputs.applicationInsightsName
   }
 }
 
@@ -184,6 +188,7 @@ module apiContainerApp 'app/api.bicep' = {
     containerRegistryName: containerApps.outputs.registryName
     openAi_4_DeploymentName: !empty(openAi_4_DeploymentName) ? openAi_4_DeploymentName : 'gpt-4'
     openAi_4_eval_DeploymentName: !empty(openAi_4_eval_DeploymentName) ? openAi_4_eval_DeploymentName : 'gpt-4-evals'
+    openAi_o3_mini_DeploymentName: !empty(openAi_o3_mini_DeploymentName) ? openAi_o3_mini_DeploymentName : 'o3-mini'
     openAiEmbeddingDeploymentName: openAiEmbeddingDeploymentName
     openAiEndpoint: ai.outputs.openAiEndpoint
     openAiName: ai.outputs.openAiName
@@ -387,6 +392,7 @@ output AZURE_RESOURCE_GROUP string = resourceGroup.name
 
 output AZURE_OPENAI_DEPLOYMENT_NAME string = openAi_4_DeploymentName
 output AZURE_OPENAI_4_EVAL_DEPLOYMENT_NAME string = openAi_4_eval_DeploymentName
+output AZURE_OPENAI_O3_MINI_DEPLOYMENT_NAME string = openAi_o3_mini_DeploymentName
 output AZURE_OPENAI_API_VERSION string = openAiApiVersion
 output AZURE_OPENAI_ENDPOINT string = ai.outputs.openAiEndpoint
 output AZURE_OPENAI_NAME string = ai.outputs.openAiName
@@ -407,6 +413,7 @@ output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerApps.outputs.registry
 output AZURE_CONTAINER_REGISTRY_NAME string = containerApps.outputs.registryName
 
 output APPINSIGHTS_CONNECTIONSTRING string = ai.outputs.applicationInsightsConnectionString
+output APPLICATIONINSIGHTS_CONNECTION_STRING string = ai.outputs.applicationInsightsConnectionString
 
 output OPENAI_TYPE string = 'azure'
 output AZURE_EMBEDDING_NAME string = openAiEmbeddingDeploymentName

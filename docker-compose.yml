@@ -19,11 +19,9 @@ services:
       - .env
     environment:
       - PYTHONUNBUFFERED=1
-      # - OTEL_EXPORTER_OTLP_ENDPOINT="http://dashboard:18889"
-      # - OTEL_SERVICE_NAME=agent-api
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://dashboard:18889
+      - OTEL_SERVICE_NAME=agent-api
       - OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT=true
-      - AZURE_TRACING_GEN_AI_CONTENT_RECORDING_ENABLED=true
-      # - LOCAL_TRACING=true
       - MCP_SERVER_URL=http://mcp-server:8080
   web:
     build:
@@ -36,7 +34,7 @@ services:
       - api
 
   dashboard:
-    image: mcr.microsoft.com/dotnet/aspire-dashboard:9.0
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:9.1
     ports:
       - 18888:18888
       - 4317:18889

@@ -7,7 +7,7 @@ model:
   api: chat
   configuration:
     type: azure_openai
-    azure_deployment: gpt-4
+    azure_deployment: gpt-4o
     api_version: 2024-08-01-preview
   parameters:
     max_tokens: 1500
@@ -33,13 +33,14 @@ The response format is a JSON array that contains a list of specialized queries
 to make to the search index. Here is an example:
 
 context: Can you find a selection of outdoor apparel?
-queries:
+
+# Example output
 [
-  "outdoor apparel",
-  "outdoor clothing",
-  "outdoor gear",
-  "outdoor clothing brands",
-  "outdoor clothing stores",
+    "outdoor apparel",
+    "outdoor clothing",
+    "outdoor gear",
+    "outdoor clothing brands",
+    "outdoor clothing stores"
 ]
 
 This only an example of the output structure. You should make sure to use the context the user gives you
@@ -47,6 +48,6 @@ to generate the queries.
 
 # Output format
 Only output the full array of specialized queries to make to the search index. Limit
-yoursef to 5 queries. Respond with a JSON array of strings, the key should always be "queries".
+yoursef to 5 queries. Its **important** that the output is a JSON array named queries.
 user:
 {{context}}

@@ -4,15 +4,12 @@ param location string = resourceGroup().location
 param tags object = {}
 
 @description('Name of the Application Insights resource')
-param applicationInsightsName string = ''
-
-@description('Specifies if Dapr is enabled')
-param daprEnabled bool = false
+param applicationInsightsName string
 
 @description('Name of the Log Analytics workspace')
 param logAnalyticsWorkspaceName string
 
-resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' = {
+resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-10-02-preview' = {
   name: name
   location: location
   tags: tags
@@ -30,6 +27,20 @@ resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01'
         workloadProfileType: 'Consumption'
       }
     ]
+    appInsightsConfiguration: {
+      connectionString: applicationInsights.properties.ConnectionString
+    }
+    openTelemetryConfiguration: {
+      logsConfiguration: {
+        destinations: ['appInsights']
+      }
+      metricsConfiguration: {
+        destinations: [] // appInsights not supported yet
+      }
+      tracesConfiguration: {
+        destinations: ['appInsights']
+      }
+    }
   }
 }
 
@@ -37,7 +48,7 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2022-10
   name: logAnalyticsWorkspaceName
 }
 
-resource applicationInsights 'Microsoft.Insights/components@2020-02-02' existing = if (daprEnabled && !empty(applicationInsightsName)) {
+resource applicationInsights 'Microsoft.Insights/components@2020-02-02' existing = {
   name: applicationInsightsName
 }
 

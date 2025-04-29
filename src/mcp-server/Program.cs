@@ -60,7 +60,11 @@ builder.Services.AddOpenTelemetry()
                 options.ConnectionString = connectionString;
             });
         }
-        tracerProviderBuilder.AddOtlpExporter();
+        var otelEndpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"];
+        if (otelEndpoint != null)
+        {
+            tracerProviderBuilder.AddOtlpExporter();
+        }
     })
     .WithMetrics(b => b
         .AddAspNetCoreInstrumentation()
@@ -74,16 +78,5 @@ builder.Services.AddMcpServer().WithHttpTransport()
 var app = builder.Build();
 
 app.MapMcp();
-
-app.MapGet("testing", async (ServiceBusArticleEventSender sender) =>
-{
-    await sender.SendAsync(new ArticlePublishingEvent
-    {
-        ArticleId = "12345",
-        ArticleContent = "Test Article",
-        PublishTime = DateTimeOffset.UtcNow
-    });
-    return Results.Ok();
-});
 
 app.Run();

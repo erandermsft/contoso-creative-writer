@@ -32,9 +32,10 @@ user:
 
 # Agent system definition
 
-{% for agent in agent_definitions %}
- - {{agent.Type}} -- {{agent.Description}}
-{% endfor %}
+- Research Agent: This agent is responsible for searching the web and finding relevant information, trends, insights related to outdoor equipment.
+- Products Agent: This agent is repsonsible for searching the product catalog and finding relevant products related to what the research agent found.
+- Assignment Agent: This agent is responsible for writing articles, blog posts, and other content based on the information found by the Research and Product Research Agents.
+- Influencer Agent: This agent uses the article provided and writes a social media post to promote the product, tailored to our customers.
 
 # Guidelines:
 Generate one task per agent based on the context provided and the agent definitions. Make sure to provide a task that is clear and actionable. The task should be specific to the agent's role and should help in achieving the overreaching goal.

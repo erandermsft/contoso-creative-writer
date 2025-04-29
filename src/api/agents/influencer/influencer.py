@@ -1,6 +1,10 @@
 from promptflow.core import Prompty, AzureOpenAIModelConfiguration
 import json
 import os 
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+from prompty.tracer import trace
+from opentelemetry import trace as oteltrace
+from openai import AzureOpenAI
 from dotenv import load_dotenv 
 from pathlib import Path
 from prompty.tracer import trace
@@ -14,13 +18,48 @@ class SocialMediaPost(BaseModel):
 class SocialMediaPosts(BaseModel):
     posts: list[SocialMediaPost]
 
+system_prompt = """
+system:
+You are a social media influencer. Your job is to design a social media post tailored to a specific customer. 
+The social media post should be based on the contents of a blog article that has been created by our senior copywriter. Use emojis and other appropriate social media elements to make the post engaging and fun.
+Respond in JSON format with an array of objects where each object contains the name of the customer and the social media post. Explicitly mention the customer's income level and how many products they can buy with their income.
 
+## Customers
+{customers}
 
+# Article
+Use the following article as context
+{article}
+# Additional instructions
+{instructions}
+
+# Output format
+Only output the full array of social media posts. Its important that the output is a single JSON object with one key "posts".
+Each post should should only contain two keys, customer and socialMediaPost, nothing else.
+"""
+
+customer = """
+{name}
+
+age: {demographic_age}
+
+location: {demographic_location}
+
+gender: {demographic_gender}
+
+income: {incomeLevel}
+
+interests:
+{interests}
+"""
 
 load_dotenv()
+
 @trace
 def influence(article, customers, instructions):
     
+    print("Influencing...")
+
     # Load prompty with AzureOpenAIModelConfiguration override
     configuration = AzureOpenAIModelConfiguration(
         azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
@@ -37,13 +76,69 @@ def influence(article, customers, instructions):
 
     # prompty_obj = Prompty.load(path_to_prompty, model=override_model)
     if customers == None:
-        customers = json.loads(open(folder + "/customers.json").read())
+       customers = json.loads(open(folder + "/customers.json").read())
 
 # parameters={"response_format": SocialMediaPosts}
     result = prompty.execute("influencer.prompty",
                              inputs={"article":article, "customers": customers, "instructions": instructions})
     
     return result
+
+@trace
+def influence_raw(article, customers, instructions):
+
+    print("Influencing...")
+    
+    client = AzureOpenAI(
+        azure_endpoint=os.getenv("APIM_ENDPOINT"),
+        api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
+        api_key=os.getenv("APIM_SUBSCRIPTION_KEY"),
+    )
+
+    if customers == None:
+       customers = json.loads(open(folder + "/customers.json").read())
+
+    formatted_customers = []
+    for customer_data in customers:
+        interests = ""
+        for interest in customer_data['interests']:
+            interests += f"{interest} \n"
+
+        formatted_customers.append(
+           customer.format(name=customer_data['name'], 
+                           demographic_age=customer_data['demographic']['age'],
+                           demographic_location=customer_data['demographic']['location'], 
+                           demographic_gender=customer_data['demographic']['gender'], 
+                           incomeLevel=customer_data['incomeLevel'],
+                           interests=interests))
+        
+    customers = "\n".join(formatted_customers)
+
+    formattedSystemPrompt = system_prompt.format(customers=customers, article=article, instructions=instructions)
+
+    messages = [
+        {
+            "role": "system",
+            "content": formattedSystemPrompt,
+        },
+        {
+            "role": "user",
+            "content": "Please create the social media posts",
+        }
+    ]
+
+    response = client.chat.completions.create(
+        model=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
+        messages=messages,
+        max_tokens=1200,
+        temperature=0.2,
+        response_format={ "type": "json_object" }
+    )
+    response_message = response.choices[0].message
+
+    print('finished influencing...')
+
+    return response_message.content
 
 
 if __name__ == "__main__":

@@ -1,9 +1,12 @@
 from promptflow.core import Prompty, AzureOpenAIModelConfiguration
 import json
 import os 
+from openai import AzureOpenAI, AsyncAzureOpenAI
 from dotenv import load_dotenv 
 from pathlib import Path
 from prompty.tracer import trace
+from azure.ai.inference.prompts import PromptTemplate
+
 folder = Path(__file__).parent.absolute().as_posix()
 
 
@@ -11,23 +14,29 @@ load_dotenv()
 @trace
 def plan(goal):
     
-    # Load prompty with AzureOpenAIModelConfiguration override
-    configuration = AzureOpenAIModelConfiguration(
-        azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
+    client = AzureOpenAI(
+        azure_endpoint=os.getenv("APIM_ENDPOINT"),
         api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
-        azure_endpoint=f"https://{os.getenv('AZURE_OPENAI_NAME')}.cognitiveservices.azure.com/"
+        api_key=os.getenv("APIM_SUBSCRIPTION_KEY"),
     )
- 
-    override_model = {
-        "configuration": configuration,
-        # "parameters": {"max_tokens": 512}
-    }
-    path_to_prompty = folder + "/planner.prompty"
-    agent_definitions = json.loads(open(folder + "/agent_definitions.json").read())
-
-    prompty_obj = Prompty.load(path_to_prompty, model=override_model)
-    result = prompty_obj(goal=goal, agent_definitions=agent_definitions)
     
+    prompt_template = PromptTemplate.from_prompty(file_path="planner.prompty")
+
+    messages = prompt_template.create_messages(goal=goal)
+
+    response = client.chat.completions.create(
+        model=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
+        messages=messages,
+        max_tokens=prompt_template.parameters["max_tokens"],
+        temperature=prompt_template.parameters["temperature"],
+        response_format=prompt_template.parameters["response_format"],
+    )
+
+    result = response.choices[0].message.content
+    result = json.loads(result)
+    
+    print(f"Result: {result}")
+
     return result
 
 

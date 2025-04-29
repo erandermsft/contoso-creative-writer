@@ -176,7 +176,7 @@ def create(research_context, product_context, assignment_context, influencer_con
     # Send the article to the influencer
     if influencer_context:
         yield start_message("influencer")
-        influencer_response = influencer.influence(article=processed_writer_result['article'], customers=None, instructions=influencer_context)
+        influencer_response = influencer.influence_raw(article=processed_writer_result['article'], customers=None, instructions=influencer_context)
         influencer_response = json.loads(influencer_response)
         if influencer_response is not None and "posts" in influencer_response:
             influencer_response = influencer_response["posts"]
@@ -206,6 +206,7 @@ def test_create_article(research_context, product_context, assignment_context):
                 print(f'Article: {article}')
     
 if __name__ == "__main__":
+
     local_trace = PromptyTracer()
     Tracer.add("PromptyTracer", local_trace.tracer)
     research_context = "Can you find the latest camping trends and what folks are doing in the winter?"

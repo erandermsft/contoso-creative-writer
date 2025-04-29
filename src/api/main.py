@@ -11,7 +11,7 @@ from fastapi import FastAPI, File, UploadFile
 from evaluate.evaluators import evaluate_image
 
 from orchestrator import Task, create, plan, Goal
-from telemetry import setup_telemetry
+from telemetry import setup_telemetry, setup_telemetry_full
 
 base = Path(__file__).resolve().parent
 
@@ -42,7 +42,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-setup_telemetry(app)
+setup_telemetry_full(app)
 
 @app.get("/")
 async def root():
@@ -53,11 +53,6 @@ async def root():
 async def create_plan(goal: Goal):
     return JSONResponse(
         plan(goal.goal)
-        # PromptyStream(
-
-        #     "create_plan", plan(goal.goal)
-        # ),
-        # media_type="text/event-stream",
     )
 
 @app.post("/api/article")
@@ -116,4 +111,4 @@ async def upload_image(file: UploadFile = File(...)):
 
 
 # TODO: fix open telemetry so it doesn't slow app so much
-FastAPIInstrumentor.instrument_app(app)
+#FastAPIInstrumentor.instrument_app(app)

@@ -8,6 +8,7 @@ from pathlib import Path
 
 from openai import AzureOpenAI, AsyncAzureOpenAI
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+from azure.ai.inference.prompts import PromptTemplate
 
 from semantic_kernel import Kernel
 from semantic_kernel.connectors.ai import FunctionChoiceBehavior
@@ -22,6 +23,7 @@ import mcp
 from mcp import types
 from mcp.client.session import ClientSession
 from mcp.client.sse import sse_client
+
 folder = Path(__file__).parent.absolute().as_posix()
 
 load_dotenv()
@@ -98,7 +100,7 @@ async def publish_article_sdk(article):
         )
 
         client = AsyncAzureOpenAI(
-            azure_deployment=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
+            azure_deployment=os.getenv("AZURE_OPENAI_O3_MINI_DEPLOYMENT_NAME"),
             api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
             azure_ad_token_provider=token_provider,
             azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT")
@@ -118,7 +120,7 @@ async def publish_article_sdk(article):
         ]
 
         response = await client.chat.completions.create(
-            model=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
+            model=os.getenv("AZURE_OPENAI_O3_MINI_DEPLOYMENT_NAME"),
             messages=messages,
             tools=openai_tools,
             tool_choice="auto",
@@ -149,7 +151,7 @@ async def publish_article_sdk(article):
             return json_r
         
         final_response = await client.chat.completions.create(
-            model=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
+            model=os.getenv("AZURE_OPENAI_O3_MINI_DEPLOYMENT_NAME"),
             messages=messages,
             tools=openai_tools,
             tool_choice="auto",
@@ -180,41 +182,25 @@ async def publish_article_sk(article):
 
     kernel = Kernel()
 
-    # token_provider = get_bearer_token_provider(
-    #     DefaultAzureCredential(), "https://cognitiveservices.azure.com/.default"
-    # )
-
-    ctx = oteltrace.get_current_span().get_span_context()
-
-    traceparent = f"00-{'{trace:032x}'.format(trace=ctx.trace_id)}-{'{span:016x}'.format(span=ctx.span_id)}-01"
-
     chat_completion = AzureChatCompletion(
-        deployment_name=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
-        #ad_token_provider=token_provider,
+        deployment_name=os.getenv("AZURE_OPENAI_O3_MINI_DEPLOYMENT_NAME"),
         api_version="2024-12-01-preview",
         api_key=os.getenv("APIM_SUBSCRIPTION_KEY"),
         endpoint=os.getenv("APIM_ENDPOINT"),
-        default_headers={
-            "traceparent": traceparent
-        }
     )
 
     kernel.add_service(chat_completion)
     
     request_settings = AzureChatPromptExecutionSettings(
         temperature=1,
-        max_tokens=4000,
+        max_completion_tokens=4000,
         function_choice_behavior=FunctionChoiceBehavior.Auto(),
-        response_format={ "type": "json_object" },
-        #tool_choice="auto"
+        response_format={ "type": "json_object" }
     )
 
     mcpPlugin = MCPSsePlugin(
             name="PublisherTools",
             url=os.getenv("MCP_SERVER_URL") + "/sse",
-            headers={
-                "traceparent": traceparent
-            },
         )
     
     await mcpPlugin.connect()
@@ -239,7 +225,6 @@ async def publish_article_sk(article):
 
     print(f"Final response: {json_r}")
     return json_r
-
 
 
 if __name__ == "__main__":

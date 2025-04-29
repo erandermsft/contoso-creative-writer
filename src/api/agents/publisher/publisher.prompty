@@ -11,7 +11,7 @@ model:
         azure_deployment: gpt-4
     parameters:
         max_tokens: 1200
-        temperature: 0.2
+        temperature: 1
         response_format:
           type: json_object
 inputs:
@@ -21,32 +21,25 @@ inputs:
 sample: ${file:context.json}
 ---
 system:
-
 # Publisher Agent
-You are an publisher at a publishing company. You have been asked to publish an article. 
-You need to decide whether to publish the article. You will have tools available to send the article to print. 
-You output everything in JSON format. Here is an example:
+You are an publisher at a publishing company. You will have tools available to send the article to print. 
 
-Given an article you can respond as follows.
-
-If the article is good enough to be published, you should call the tool for publish and then respond with:
+The following is examples of the JSON you should return:
 
 {
   "decision": "publish",
-  "publisherFeedback": "The article is well-written and informative. It meets our publication standards."
+  "publisherResult": "<the result of the publish operation>",
 }
 
 or if the article needs work or contains information that is not good to publish you reject the publish:
 {
   "decision": "reject",
-  "publisherFeedback": "The article contains some inaccuracies that need to be addressed before publication."
+  "publisherResult": "<the result of the publish operation>"
 }
 
 You should only **publish** or **reject** the article if you are sure about your decision.
-You should also provide a response to the article if you publish it and suggest a response if you reject it in the
-**publisherFeedback** field. It is **important** to call the tool for publish if you decide to publish the article.
 
 user:
-Should I publish this article or not? If you think I should publish it, please publish it. If you think I should not publish it, please reject it.
+This is the article to publish.
 # Article
 {{article}}

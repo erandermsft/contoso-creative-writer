@@ -10,6 +10,7 @@ param containerRegistryName string
 param serviceName string = 'api'
 param openAi_4_DeploymentName string
 param openAi_4_eval_DeploymentName string
+param openAi_o3_mini_DeploymentName string
 param openAiEndpoint string
 param openAiName string
 param bingName string
@@ -92,6 +93,10 @@ module app '../core/host/container-app-upsert.bicep' = {
       {
         name: 'AZURE_OPENAI_4_EVAL_DEPLOYMENT_NAME'
         value: openAi_4_eval_DeploymentName
+      }
+      {
+        name: 'AZURE_OPENAI_O3_MINI_DEPLOYMENT_NAME'
+        value: openAi_o3_mini_DeploymentName
       }
       {
         name: 'AZURE_AI_PROJECT_NAME'
