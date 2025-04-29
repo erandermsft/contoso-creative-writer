@@ -1,7 +1,6 @@
-from promptflow.core import Prompty, AzureOpenAIModelConfiguration
 import json
 import os 
-from openai import AzureOpenAI, AsyncAzureOpenAI
+from openai import AzureOpenAI
 from dotenv import load_dotenv 
 from pathlib import Path
 from prompty.tracer import trace
@@ -11,6 +10,7 @@ folder = Path(__file__).parent.absolute().as_posix()
 
 
 load_dotenv()
+
 @trace
 def plan(goal):
     

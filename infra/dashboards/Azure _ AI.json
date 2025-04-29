@@ -21,13 +21,13 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "10.4.11"
+      "version": "11.2.2"
     },
     {
       "type": "datasource",
       "id": "grafana-azure-monitor-datasource",
       "name": "Azure Monitor",
-      "version": "1.0.0"
+      "version": "11.2.2"
     },
     {
       "type": "panel",
@@ -141,6 +141,7 @@
         "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "sum"
@@ -153,7 +154,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.11",
+      "pluginVersion": "11.2.2",
       "targets": [
         {
           "azureLogAnalytics": {
@@ -241,6 +242,7 @@
         "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "sum"
@@ -253,7 +255,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.11",
+      "pluginVersion": "11.2.2",
       "targets": [
         {
           "azureLogAnalytics": {
@@ -341,6 +343,7 @@
         "graphMode": "none",
         "justifyMode": "center",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "sum"
@@ -353,7 +356,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.11",
+      "pluginVersion": "11.2.2",
       "targets": [
         {
           "azureLogAnalytics": {
@@ -388,6 +391,107 @@
             "fixedColor": "green",
             "mode": "fixed"
           },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "users/count_unique"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "${res}  | Users",
+                    "url": "https://portal.azure.com/#@${tenant}/resource/subscriptions/${sub}/resourceGroups/${rg}/providers/microsoft.insights/components/${res}/segmentationUsers"
+                  }
+                ]
+              },
+              {
+                "id": "displayName",
+                "value": "Users"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 5,
+        "x": 13,
+        "y": 0
+      },
+      "id": 67,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {},
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.2.2",
+      "targets": [
+        {
+          "azureLogAnalytics": {
+            "dashboardTime": false,
+            "query": "let cost_table = datatable(model:string , prompt_cost:decimal, completion_cost:decimal)\n[\n   \"gpt-4o-2024-08-06\", 0.0000025, 0.00001,\n   \"o3-mini-2025-01-31\", 0.0000011, 0.0000044,\n];\ndependencies\n| where $__timeFilter(timestamp)\n| extend model = tostring(customDimensions[\"gen_ai.response.model\"])\n| where model != \"\"\n| extend\n    deployment = tostring(customDimensions[\"gen_ai.request.model\"]),\n    prompt_tokens = toint(customDimensions[\"gen_ai.usage.input_tokens\"]),\n    completion_tokens = toint(customDimensions[\"gen_ai.usage.output_tokens\"])\n| join kind=leftouter cost_table on model\n| extend \n    model_prompt_cost = prompt_tokens * prompt_cost,\n    model_completion_cost = completion_tokens * completion_cost\n| summarize \n    totalcost=sum(model_prompt_cost)+sum(model_completion_cost)\n",
+            "resources": [
+              "/subscriptions/$sub/resourceGroups/$rg/providers/$ns/$res"
+            ],
+            "resultFormat": "time_series"
+          },
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource",
+            "uid": "${DS_AZURE_MONITOR}"
+          },
+          "queryType": "Azure Log Analytics",
+          "refId": "B",
+          "subscription": "$sub",
+          "subscriptions": []
+        }
+      ],
+      "title": "Current cost",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource",
+        "uid": "${DS_AZURE_MONITOR}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "green",
+            "mode": "fixed"
+          },
           "custom": {
             "axisBorderShow": false,
             "axisCenteredZero": false,
@@ -396,6 +500,7 @@
             "axisPlacement": "auto",
             "axisSoftMin": 0,
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 64,
             "gradientMode": "opacity",
@@ -548,7 +653,7 @@
         {
           "azureLogAnalytics": {
             "dashboardTime": false,
-            "query": "let minDuration = iif(isempty(\"$min_duration\"), \"0\", \"$min_duration\");\nlet maxDuration = iif(isempty(\"$max_duration\"), \"0\", \"$max_duration\");\n\nrequests// additional filters can be applied here\n| where $__timeFilter(timestamp)\n| where client_Type != \"Browser\"\n//| where (\"All\" in ($operation_name) or operation_Name in ($operation_name))\n//| where duration >= todouble(minDuration) and duration <= todouble(maxDuration)\n// calculate average request duration for all requests\n| summarize AVG = avg(duration), P95 = percentiles(duration, 95), MAX = max(duration) by bin(timestamp, $__interval)\n| project timestamp, AVG = AVG/1000, P95 = P95/1000, MAX = MAX/1000\n| order by timestamp asc\n\n",
+            "query": "let minDuration = iif(isempty(\"$min_duration\"), \"0\", \"$min_duration\");\nlet maxDuration = iif(isempty(\"$max_duration\"), \"0\", \"$max_duration\");\n\nrequests// additional filters can be applied here\n| where $__timeFilter(timestamp)\n| where client_Type != \"Browser\"\n| where operation_Name != \"GET /sse\"\n//| where (\"All\" in ($operation_name) or operation_Name in ($operation_name))\n//| where duration >= todouble(minDuration) and duration <= todouble(maxDuration)\n// calculate average request duration for all requests\n| summarize AVG = avg(duration), P95 = percentiles(duration, 95), MAX = max(duration) by bin(timestamp, $__interval)\n| project timestamp, AVG = AVG/1000, P95 = P95/1000, MAX = MAX/1000\n| order by timestamp asc\n\n",
             "resources": [
               "/subscriptions/$sub/resourceGroups/$rg/providers/$ns/$res"
             ],
@@ -635,12 +740,12 @@
           "unit": "short"
         }
       },
-      "pluginVersion": "10.4.11",
+      "pluginVersion": "11.2.2",
       "targets": [
         {
           "azureLogAnalytics": {
             "dashboardTime": false,
-            "query": "requests\n// additional filters can be applied here\n| where $__timeFilter(timestamp)\n| where client_Type != \"Browser\"\n// calculate average request duration for all requests\n| extend ResponseTime = duration/1000\n| project timestamp, ResponseTime\n| order by timestamp asc\n\n",
+            "query": "requests\n// additional filters can be applied here\n| where $__timeFilter(timestamp)\n| where client_Type != \"Browser\"\n| where operation_Name != \"GET /sse\"\n// calculate average request duration for all requests\n| extend ResponseTime = duration/1000\n| project timestamp, ResponseTime\n| order by timestamp asc\n\n",
             "resources": [
               "/subscriptions/$sub/resourceGroups/$rg/providers/$ns/$res"
             ],
@@ -725,12 +830,12 @@
         },
         "showHeader": true
       },
-      "pluginVersion": "10.4.11",
+      "pluginVersion": "11.2.2",
       "targets": [
         {
           "azureLogAnalytics": {
             "dashboardTime": false,
-            "query": "dependencies\r\n| where $__timeFilter(timestamp)\r\n| extend model = tostring(customDimensions[\"gen_ai.response.model\"])\r\n| where model != \"\"\r\n| extend\r\n    deployment = tostring(customDimensions[\"gen_ai.request.model\"]),\r\n    prompt_tokens = toint(customDimensions[\"gen_ai.usage.input_tokens\"]),\r\n    completion_tokens = toint(customDimensions[\"gen_ai.usage.output_tokens\"])\r\n| summarize prompt = sum(prompt_tokens), completion = sum(completion_tokens), total = sum(prompt_tokens +completion_tokens) by model, deployment",
+            "query": "let cost_table = datatable(model:string , prompt_cost:decimal, completion_cost:decimal)\r\n[\r\n   \"gpt-4o-2024-08-06\", 0.0000025, 0.00001,\r\n   \"o3-mini-2025-01-31\", 0.0000011, 0.0000044,\r\n];\r\ndependencies\r\n| where $__timeFilter(timestamp)\r\n| extend model = tostring(customDimensions[\"gen_ai.response.model\"])\r\n| where model != \"\"\r\n| extend\r\n    deployment = tostring(customDimensions[\"gen_ai.request.model\"]),\r\n    prompt_tokens = toint(customDimensions[\"gen_ai.usage.input_tokens\"]),\r\n    completion_tokens = toint(customDimensions[\"gen_ai.usage.output_tokens\"])\r\n| join kind=leftouter cost_table on model\r\n| extend \r\n    model_prompt_cost = prompt_tokens * prompt_cost,\r\n    model_completion_cost = completion_tokens * completion_cost\r\n| summarize \r\n    prompt = sum(prompt_tokens), \r\n    completion = sum(completion_tokens), \r\n    total = sum(prompt_tokens) + sum(completion_tokens), \r\n    promptcost=sum(model_prompt_cost),\r\n    completioncost=sum(model_completion_cost),\r\n    totalcost=sum(model_prompt_cost)+sum(model_completion_cost)\r\n    by model, deployment\r\n",
             "resources": [
               "/subscriptions/$sub/resourceGroups/$rg/providers/Microsoft.Insights/components/$res"
             ],
@@ -778,7 +883,7 @@
       },
       "gridPos": {
         "h": 9,
-        "w": 12,
+        "w": 10,
         "x": 0,
         "y": 20
       },
@@ -801,7 +906,7 @@
         "sizing": "auto",
         "valueMode": "text"
       },
-      "pluginVersion": "10.4.11",
+      "pluginVersion": "11.2.2",
       "targets": [
         {
           "azureLogAnalytics": {
@@ -842,6 +947,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 15,
             "gradientMode": "none",
@@ -886,8 +992,8 @@
       },
       "gridPos": {
         "h": 9,
-        "w": 9,
-        "x": 12,
+        "w": 11,
+        "x": 10,
         "y": 20
       },
       "id": 60,
@@ -1174,7 +1280,7 @@
         "showHeader": true,
         "sortBy": []
       },
-      "pluginVersion": "10.4.11",
+      "pluginVersion": "11.2.2",
       "targets": [
         {
           "azureLogAnalytics": {
@@ -1205,11 +1311,7 @@
   "templating": {
     "list": [
       {
-        "current": {
-          "selected": false,
-          "text": "Azure Monitor",
-          "value": "azure-monitor-oob"
-        },
+        "current": {},
         "hide": 0,
         "includeAll": false,
         "label": "Datasource",
@@ -1346,6 +1448,6 @@
   "timezone": "",
   "title": "Azure / AI",
   "uid": "eea9zehfav4sgc",
-  "version": 3,
+  "version": 10,
   "weekStart": ""
 }

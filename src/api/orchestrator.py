@@ -119,7 +119,7 @@ def create(research_context, product_context, assignment_context, influencer_con
 
     # Then send it to the editor, to decide if it's good or not
     yield start_message("editor")
-    editor_response = editor.edit(processed_writer_result['article'], processed_writer_result["feedback"])
+    editor_response = editor.editor_feedback(processed_writer_result['article'], processed_writer_result["feedback"])
 
     yield complete_message("editor", editor_response)
     yield complete_message("writer", {"complete": True})
@@ -148,7 +148,7 @@ def create(research_context, product_context, assignment_context, influencer_con
 
         # Then send it to the editor, to decide if it's good or not
         yield start_message("editor")
-        editor_response = editor.edit(processed_writer_result['article'], processed_writer_result["feedback"])
+        editor_response = editor.editor_feedback(processed_writer_result['article'], processed_writer_result["feedback"])
 
         retry_count += 1
         if retry_count >= 2:
@@ -176,7 +176,7 @@ def create(research_context, product_context, assignment_context, influencer_con
     # Send the article to the influencer
     if influencer_context:
         yield start_message("influencer")
-        influencer_response = influencer.influence_raw(article=processed_writer_result['article'], customers=None, instructions=influencer_context)
+        influencer_response = influencer.influence(article=processed_writer_result['article'], customers=None, instructions=influencer_context)
         influencer_response = json.loads(influencer_response)
         if influencer_response is not None and "posts" in influencer_response:
             influencer_response = influencer_response["posts"]

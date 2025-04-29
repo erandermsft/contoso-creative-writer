@@ -10,6 +10,7 @@ services:
       - SERILOG__MINIMUMLEVEL=Information
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://dashboard:18889
       - OTEL_SERVICE_NAME=mcp-server
+      - DISABLE_APPINSIGHTS=true
   api:
     build:
       context: src/api 

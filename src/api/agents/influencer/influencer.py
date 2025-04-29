@@ -1,9 +1,7 @@
 from promptflow.core import Prompty, AzureOpenAIModelConfiguration
 import json
 import os 
-from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from prompty.tracer import trace
-from opentelemetry import trace as oteltrace
 from openai import AzureOpenAI
 from dotenv import load_dotenv 
 from pathlib import Path
@@ -56,7 +54,7 @@ interests:
 load_dotenv()
 
 @trace
-def influence(article, customers, instructions):
+def influence_old(article, customers, instructions):
     
     print("Influencing...")
 
@@ -85,10 +83,10 @@ def influence(article, customers, instructions):
     return result
 
 @trace
-def influence_raw(article, customers, instructions):
+def influence(article, customers, instructions):
 
     print("Influencing...")
-    
+
     client = AzureOpenAI(
         azure_endpoint=os.getenv("APIM_ENDPOINT"),
         api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
