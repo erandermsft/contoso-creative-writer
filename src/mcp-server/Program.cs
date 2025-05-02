@@ -54,7 +54,7 @@ builder.Services.AddOpenTelemetry()
         
         var disableAppInsights = builder.Configuration.GetValue("DISABLE_APPINSIGHTS", false);
         var connectionString = builder.Configuration["APPINSIGHTS_CONNECTIONSTRING"] ?? builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
-        if (connectionString != null || !disableAppInsights)
+        if (connectionString != null && !disableAppInsights)
         {
             tracerProviderBuilder.AddAzureMonitorTraceExporter(options =>
             {
