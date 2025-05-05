@@ -9,8 +9,8 @@
   </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="ModelContextProtocol" Version="0.1.0-preview.10" />
-        <PackageReference Include="ModelContextProtocol.AspNetCore" Version="0.1.0-preview.10" />
+        <PackageReference Include="ModelContextProtocol" Version="0.1.0-preview.11" />
+        <PackageReference Include="ModelContextProtocol.AspNetCore" Version="0.1.0-preview.11" />
         <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
         <PackageReference Include="Serilog.Sinks.OpenTelemetry" Version="4.1.1" />

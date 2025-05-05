@@ -43,6 +43,7 @@ builder.AddAzureServiceBusClient("publishing_fullyQualifiedNamespace", settings 
     }
 });
 builder.Services.AddScoped<ServiceBusArticleEventSender>();
+builder.Services.AddScoped<ServiceBusSocialMediaEventSender>();
 
 // OpenTelemetry Configuration
 builder.Services.AddOpenTelemetry()
@@ -74,7 +75,8 @@ builder.Services.AddOpenTelemetry()
 
 // MCP Configuration
 builder.Services.AddMcpServer().WithHttpTransport()
-    .WithTools<ArticlePublishingTool>();
+    .WithTools<ArticlePublishingTool>()
+    .WithTools<SocialMediaPosterTool>();
 
 var app = builder.Build();
 
