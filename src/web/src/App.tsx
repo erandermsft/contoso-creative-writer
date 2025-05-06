@@ -3,6 +3,7 @@ import { version } from "./version";
 import Toolbar from "./components/toolbar";
 import Article from "./components/article";
 import Task from './components/task';
+import ProgressPanel from './components/progress-panel';
 
 function App() {
   return (
@@ -15,11 +16,16 @@ function App() {
         </p>
         <hr className="border-2 border-blue-300 my-6 w-3/4 mx-auto rounded-full" />
       </header>
+      
+      {/* Progress Panel */}
+      <div className="container mx-auto px-4 mb-6">
+        <ProgressPanel />
+      </div>
 
       {/* Main Content Wrapper */}
-      <div className="flex flex-col lg:flex-row lg:space-x-8 mt-8">
+      <div className="flex flex-col lg:flex-row lg:space-x-8 mt-8 flex-grow">
         {/* Task Section - Left Aligned */}
-        <div className="lg:w-1/3 bg-white p-6 rounded-lg shadow-lg border-t-4 border-blue-500 transition-all hover:shadow-xl">
+        <div className="lg:w-1/3 bg-white p-6 rounded-lg shadow-lg border-t-4 border-blue-500 transition-all hover:shadow-xl lg:self-start lg:sticky lg:top-8">
           <h3 className="text-2xl text-blue-800 font-semibold mb-4">Content Creation Panel</h3>
           <Task />
           <div className="text-center mt-6">
@@ -28,10 +34,12 @@ function App() {
         </div>
 
         {/* Article Section - Right Aligned */}
-        <section className="lg:w-2/3 flex-grow mt-8 lg:mt-0">
-          <div className="bg-white shadow-lg rounded-lg p-8 border-t-4 border-indigo-500 transition-all hover:shadow-xl">
+        <section className="lg:w-2/3 flex-grow mt-8 lg:mt-0 flex flex-col">
+          <div className="bg-white shadow-lg rounded-lg p-8 border-t-4 border-indigo-500 transition-all hover:shadow-xl flex flex-col flex-grow overflow-hidden">
             <h2 className="text-3xl text-blue-800 font-semibold mb-4">Your Marketing Content</h2>
-            <Article />
+            <div className="overflow-y-auto flex-grow" id="content-container">
+              <Article />
+            </div>
           </div>
           <div>
           </div>

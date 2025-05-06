@@ -2,7 +2,7 @@ import Block from "./block";
 import { useRemark } from "react-remark";
 import remarkGemoji from "remark-gemoji";
 import { useAppSelector } from "../store/hooks";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import "./article.css";
 
 export const Article = () => {
@@ -14,9 +14,32 @@ export const Article = () => {
   });
 
   const articles = useAppSelector((state) => state.article);
+  const prevArticleLengthRef = useRef<number>(0);
 
   useEffect(() => {
     setMarkdownSource(articles.currentArticle);
+    
+    // Check if content is being generated (i.e., content length is increasing)
+    if (articles.currentArticle.length > prevArticleLengthRef.current) {
+      const contentContainer = document.getElementById('content-container');
+      if (contentContainer) {
+        // Calculate if we're already at the bottom (or close to it)
+        const isNearBottom = contentContainer.scrollHeight - contentContainer.scrollTop - contentContainer.clientHeight < 150;
+        
+        // Only auto-scroll if we're already near the bottom or if this is a new article
+        if (isNearBottom || prevArticleLengthRef.current === 0) {
+          // Scroll to the bottom with smooth animation after a short delay to let the content render
+          setTimeout(() => {
+            contentContainer.scrollTo({
+              top: contentContainer.scrollHeight,
+              behavior: 'smooth'
+            });
+          }, 100);
+        }
+      }
+    }
+    
+    prevArticleLengthRef.current = articles.currentArticle.length;
   }, [articles.currentArticle, setMarkdownSource]);
 
   return (

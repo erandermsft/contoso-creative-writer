@@ -24,14 +24,28 @@ export const Task = () => {
   const dispatch = useAppDispatch();
 
   const startPlan = async () => {
-    // console.log("Starting Plan");
+    // Add a message to indicate the planning has started
+    dispatch(addMessage({
+      type: "message",
+      message: "Planning content creation process..."
+    }));
+    
+    // Generate the plan
     const response = await generatePlan(goal);
     console.log(response);
+    
+    // Set the form values
     setResearch(response.research);
     setProducts(response.products);
     setWriting(response.assignment);
     setInfluence(response.influencer);
     setShowDetailedInstructions(true);
+    
+    // Add a message to indicate the planning is complete
+    dispatch(addMessage({
+      type: "message",
+      message: "Content plan created successfully. Ready to begin content creation."
+    }));
   };
 
   const setExample = () => {
@@ -75,6 +89,13 @@ export const Task = () => {
     if (research === "" || products === "" || writing === "") {
       return;
     }
+    
+    // Add a starting message to initialize the progress panel
+    dispatch(addMessage({
+      type: "message",
+      message: "Starting content creation process..."
+    }));
+    
     startWritingTask(
       research,
       products,
