@@ -4,6 +4,7 @@ import {
   BugAntIcon,
   BuildingStorefrontIcon,
   DocumentArrowUpIcon,
+  MegaphoneIcon,
   BeakerIcon,
   AcademicCapIcon,
   UserIcon,
@@ -53,6 +54,8 @@ export const Debug = () => {
         return "bg-violet-200 text-zinc-600";
       case "editor":
         return "bg-amber-200 text-zinc-600";
+      case "influencer":
+        return "bg-sky-200 text-zinc-600";
       case "publishing":
         return "bg-sky-200 text-zinc-600";
       case "error":
@@ -74,6 +77,8 @@ export const Debug = () => {
         return <UserIcon className="w-6 stroke-violet-600" />;
       case "editor":
         return <PencilIcon className="w-6 stroke-amber-600" />;
+      case "influencer":
+        return <MegaphoneIcon className="w-6 stroke-sky-600" />;
       case "publishing":
         return <DocumentArrowUpIcon className="w-6 stroke-sky-600" />;
       case "error":

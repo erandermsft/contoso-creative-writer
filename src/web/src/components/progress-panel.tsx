@@ -6,7 +6,8 @@ import {
   AcademicCapIcon,
   UserIcon,
   PencilIcon,
-  DocumentArrowUpIcon,
+  // DocumentArrowUpIcon,
+  MegaphoneIcon,
 } from "@heroicons/react/24/outline";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 
@@ -65,11 +66,11 @@ export const ProgressPanel = () => {
       lastMessage: ""
     },
     {
-      name: "Publishing",
-      icon: <DocumentArrowUpIcon className="w-6 h-6" />,
-      color: "text-blue-600 border-blue-600",
+      name: "Influencer",
+      icon: <MegaphoneIcon className="w-6 h-6" />,
+      color: "text-sky-600 border-sky-600",
       status: "waiting",
-      description: "Preparing content for distribution",
+      description: "Generating social media content for distribution",
       progress: 0,
       lastMessage: ""
     }

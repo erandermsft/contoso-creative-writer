@@ -21,13 +21,13 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "11.2.2"
+      "version": "11.2.8+security-01"
     },
     {
       "type": "datasource",
       "id": "grafana-azure-monitor-datasource",
       "name": "Azure Monitor",
-      "version": "11.2.2"
+      "version": "11.2.9"
     },
     {
       "type": "panel",
@@ -45,6 +45,12 @@
       "type": "panel",
       "id": "table",
       "name": "Table",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "text",
+      "name": "Text",
       "version": ""
     },
     {
@@ -78,6 +84,45 @@
   "links": [],
   "liveNow": false,
   "panels": [
+    {
+      "datasource": {
+        "type": "grafana-azure-monitor-datasource",
+        "uid": "${DS_AZURE_MONITOR}"
+      },
+      "description": "",
+      "gridPos": {
+        "h": 3,
+        "w": 20,
+        "x": 0,
+        "y": 0
+      },
+      "id": 68,
+      "options": {
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
+        },
+        "content": "# Contoso Marketing Team\n\nThis is demo dashboard showning AI metrics",
+        "mode": "markdown"
+      },
+      "pluginVersion": "11.2.8+security-01",
+      "targets": [
+        {
+          "azureMonitor": {
+            "allowedTimeGrainsMs": [],
+            "timeGrain": "auto"
+          },
+          "datasource": {
+            "type": "grafana-azure-monitor-datasource",
+            "uid": "${DS_AZURE_MONITOR}"
+          },
+          "queryType": "Azure Monitor",
+          "refId": "A"
+        }
+      ],
+      "type": "text"
+    },
     {
       "datasource": {
         "type": "grafana-azure-monitor-datasource",
@@ -131,9 +176,9 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 4,
+        "w": 5,
         "x": 0,
-        "y": 0
+        "y": 3
       },
       "id": 48,
       "options": {
@@ -154,7 +199,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.2.2",
+      "pluginVersion": "11.2.8+security-01",
       "targets": [
         {
           "azureLogAnalytics": {
@@ -232,9 +277,9 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 4,
-        "x": 4,
-        "y": 0
+        "w": 5,
+        "x": 5,
+        "y": 3
       },
       "id": 58,
       "options": {
@@ -255,7 +300,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.2.2",
+      "pluginVersion": "11.2.8+security-01",
       "targets": [
         {
           "azureLogAnalytics": {
@@ -334,8 +379,8 @@
       "gridPos": {
         "h": 3,
         "w": 5,
-        "x": 8,
-        "y": 0
+        "x": 10,
+        "y": 3
       },
       "id": 65,
       "options": {
@@ -356,7 +401,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.2.2",
+      "pluginVersion": "11.2.8+security-01",
       "targets": [
         {
           "azureLogAnalytics": {
@@ -435,8 +480,8 @@
       "gridPos": {
         "h": 3,
         "w": 5,
-        "x": 13,
-        "y": 0
+        "x": 15,
+        "y": 3
       },
       "id": 67,
       "options": {
@@ -457,7 +502,7 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "11.2.2",
+      "pluginVersion": "11.2.8+security-01",
       "targets": [
         {
           "azureLogAnalytics": {
@@ -625,7 +670,7 @@
         "h": 9,
         "w": 10,
         "x": 0,
-        "y": 3
+        "y": 6
       },
       "id": 59,
       "interval": "60s",
@@ -694,9 +739,9 @@
       },
       "gridPos": {
         "h": 9,
-        "w": 11,
+        "w": 10,
         "x": 10,
-        "y": 3
+        "y": 6
       },
       "id": 64,
       "interval": "60s",
@@ -740,7 +785,7 @@
           "unit": "short"
         }
       },
-      "pluginVersion": "11.2.2",
+      "pluginVersion": "11.2.8+security-01",
       "targets": [
         {
           "azureLogAnalytics": {
@@ -770,7 +815,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 12
+        "y": 15
       },
       "id": 63,
       "panels": [],
@@ -812,10 +857,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 7,
-        "w": 21,
+        "h": 5,
+        "w": 20,
         "x": 0,
-        "y": 13
+        "y": 16
       },
       "id": 61,
       "options": {
@@ -830,7 +875,7 @@
         },
         "showHeader": true
       },
-      "pluginVersion": "11.2.2",
+      "pluginVersion": "11.2.8+security-01",
       "targets": [
         {
           "azureLogAnalytics": {
@@ -885,7 +930,7 @@
         "h": 9,
         "w": 10,
         "x": 0,
-        "y": 20
+        "y": 21
       },
       "id": 66,
       "options": {
@@ -906,7 +951,7 @@
         "sizing": "auto",
         "valueMode": "text"
       },
-      "pluginVersion": "11.2.2",
+      "pluginVersion": "11.2.8+security-01",
       "targets": [
         {
           "azureLogAnalytics": {
@@ -992,9 +1037,9 @@
       },
       "gridPos": {
         "h": 9,
-        "w": 11,
+        "w": 10,
         "x": 10,
-        "y": 20
+        "y": 21
       },
       "id": 60,
       "options": {
@@ -1036,7 +1081,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 29
+        "y": 30
       },
       "id": 55,
       "panels": [],
@@ -1260,9 +1305,9 @@
       },
       "gridPos": {
         "h": 10,
-        "w": 21,
+        "w": 20,
         "x": 0,
-        "y": 30
+        "y": 31
       },
       "id": 57,
       "interval": "60s",
@@ -1280,12 +1325,12 @@
         "showHeader": true,
         "sortBy": []
       },
-      "pluginVersion": "11.2.2",
+      "pluginVersion": "11.2.8+security-01",
       "targets": [
         {
           "azureLogAnalytics": {
             "dashboardTime": false,
-            "query": "let minDuration = iif(isempty(\"$min_duration\"), \"0\", \"$min_duration\");\nlet maxDuration = iif(isempty(\"$max_duration\"), \"0\", \"$max_duration\");\n\nlet min_length_8 = (s: string) {\n    let len = strlen(s);\n    case(len == 1, strcat(s, s, s, s, s, s, s, s),\n        len == 2 or len == 3, strcat(s, s, s, s),\n        len == 4 or len == 5 or len == 6 or len == 7, strcat(s, s),\n        s)\n};\nlet ai_hash = (s: string) {\n    abs(toint(__hash_djb2(min_length_8(s))))\n};\nrequests\n//| where (\"All\" in ($operation_name) or operation_Name in ($operation_name))\n| where $__timeFilter(timestamp)\n| where operation_Name !startswith \"OPTIONS\"\n//| where duration >= todouble(minDuration) and duration <= todouble(maxDuration)\n| project Name = operation_Name, Time=timestamp, ResponseCode = resultCode, ResponseTime = duration, OperationID = operation_Id, Score=ai_hash(operation_Id)\n| top 20 by Score asc",
+            "query": "let minDuration = iif(isempty(\"$min_duration\"), \"0\", \"$min_duration\");\nlet maxDuration = iif(isempty(\"$max_duration\"), \"0\", \"$max_duration\");\n\nlet min_length_8 = (s: string) {\n    let len = strlen(s);\n    case(len == 1, strcat(s, s, s, s, s, s, s, s),\n        len == 2 or len == 3, strcat(s, s, s, s),\n        len == 4 or len == 5 or len == 6 or len == 7, strcat(s, s),\n        s)\n};\nlet ai_hash = (s: string) {\n    abs(toint(__hash_djb2(min_length_8(s))))\n};\nrequests\n//| where (\"All\" in ($operation_name) or operation_Name in ($operation_name))\n| where $__timeFilter(timestamp)\n| where operation_Name !startswith \"OPTIONS\"\n| where operation_Name != \"GET /sse\"\n//| where duration >= todouble(minDuration) and duration <= todouble(maxDuration)\n| project Name = operation_Name, Time=timestamp, ResponseCode = resultCode, ResponseTime = duration, OperationID = operation_Id, Score=ai_hash(operation_Id)\n| top 20 by Score asc",
             "resources": [
               "/subscriptions/$sub/resourceGroups/$rg/providers/$ns/$res"
             ],
@@ -1441,13 +1486,13 @@
     ]
   },
   "time": {
-    "from": "now-3h",
+    "from": "now-2d",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Azure / AI",
   "uid": "eea9zehfav4sgc",
-  "version": 10,
+  "version": 15,
   "weekStart": ""
 }
