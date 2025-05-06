@@ -9,9 +9,9 @@ type Props = {
 
 export const Block = ({ children, outerClassName, innerClassName }: Props) => {
   return (
-    <div className={clsx(outerClassName)}>
+    <div className={clsx("w-full", outerClassName)}>
       <div
-        className={clsx("max-w-screen-xl pl-3 pr-3 xl:mx-auto", innerClassName)}
+        className={clsx("max-w-screen-xl pl-3 pr-3 xl:mx-auto w-full", innerClassName)}
       >
         {children}
       </div>

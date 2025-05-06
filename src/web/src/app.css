@@ -10,10 +10,15 @@ html, body {
   height: 100%;
   margin: 0;
   font-family: 'Inter', sans-serif;
+  scroll-behavior: smooth;
 }
 
 main {
   background-color: #f9fafb;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 header, footer {
@@ -27,6 +32,94 @@ section {
 }
 
 img {
-  border-radius: 10px 0 0 0;
-  box-shadow: 0px 0px 10px #888;
+  border-radius: 10px;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+img:hover {
+  transform: scale(1.02);
+}
+
+button {
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
+
+input, textarea {
+  transition: border 0.2s ease;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* Animate content transitions */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Content container styling */
+#content-container {
+  height: calc(100vh - 300px);
+  min-height: 400px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  padding-right: 10px;
+  position: relative;
+}
+
+/* Scrollbar styling for Webkit (Chrome, Safari, newer Edge) */
+#content-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+#content-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+#content-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+#content-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Scrollbar styling for Firefox */
+#content-container {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+/* New content highlight animation */
+@keyframes highlightNewContent {
+  0% {
+    background-color: rgba(191, 219, 254, 0.3); /* light blue */
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.new-content {
+  animation: highlightNewContent 2s ease-out forwards;
 }

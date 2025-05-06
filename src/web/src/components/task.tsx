@@ -24,14 +24,28 @@ export const Task = () => {
   const dispatch = useAppDispatch();
 
   const startPlan = async () => {
-    // console.log("Starting Plan");
+    // Add a message to indicate the planning has started
+    dispatch(addMessage({
+      type: "message",
+      message: "Planning content creation process..."
+    }));
+    
+    // Generate the plan
     const response = await generatePlan(goal);
     console.log(response);
+    
+    // Set the form values
     setResearch(response.research);
     setProducts(response.products);
     setWriting(response.assignment);
     setInfluence(response.influencer);
     setShowDetailedInstructions(true);
+    
+    // Add a message to indicate the planning is complete
+    dispatch(addMessage({
+      type: "message",
+      message: "Content plan created successfully. Ready to begin content creation."
+    }));
   };
 
   const setExample = () => {
@@ -75,6 +89,13 @@ export const Task = () => {
     if (research === "" || products === "" || writing === "") {
       return;
     }
+    
+    // Add a starting message to initialize the progress panel
+    dispatch(addMessage({
+      type: "message",
+      message: "Starting content creation process..."
+    }));
+    
     startWritingTask(
       research,
       products,
@@ -105,25 +126,26 @@ export const Task = () => {
             name="goal"
             rows={3}
             cols={60}
-            className="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            placeholder="What marketing content would you like to create?"
+            className="p-3 block w-full rounded-lg border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-blue-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm sm:leading-6 transition-all duration-200"
             value={goal}
             onChange={(e) => setGoal(e.target.value)}
           />
         </div>
-        <div className="flex justify-end gap-2 mt-10">
+        <div className="flex justify-end gap-3 mt-10">
         <button
             type="button"
-            className="flex flex-row gap-3 items-center rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+            className="flex flex-row gap-2 items-center rounded-md bg-white px-4 py-2.5 text-sm font-medium text-gray-800 shadow-sm border border-gray-200 hover:bg-gray-50 transition-all duration-200"
             onClick={() => setShowDetailedInstructions(!showDetailedInstructions)}
           >
-             <span>Toggle details</span>
+             <span>{showDetailedInstructions ? 'Hide Details' : 'Show Details'}</span>
              </button>
           <button
             type="button"
-            className="flex flex-row gap-3 items-center rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+            className="flex flex-row gap-2 items-center rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 transition-all duration-200"
             onClick={startPlan}
           >
-            <span>Plan</span>
+            <span>Generate Plan</span>
           </button>
         </div>
       </div>
@@ -134,21 +156,22 @@ export const Task = () => {
             <div className="text-start">
               <label
                 htmlFor="research"
-                className="block text-sm font-medium leading-6 text-gray-900"
+                className="block text-sm font-medium leading-6 text-blue-800"
               >
                 Research
               </label>
-              <p className="mt-1 text-sm leading-6 text-gray-400">
-                What kinds of things should I find?
+              <p className="mt-1 text-sm leading-6 text-gray-500">
+                What kinds of information should our team research?
               </p>
               <div className="mt-2">
-                <div className=" flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-600">
+                <div className="flex rounded-lg shadow-sm focus-within:ring-2 focus-within:ring-inset focus-within:ring-blue-500">
                   <textarea
                     id="research"
                     name="research"
                     rows={3}
                     cols={60}
-                    className="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    placeholder="Enter research topics here..."
+                    className="p-3 block w-full rounded-lg border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-blue-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm sm:leading-6 transition-all duration-200"
                     value={research}
                     onChange={(e) => setResearch(e.target.value)}
                   />
@@ -158,12 +181,12 @@ export const Task = () => {
             <div className="text-start mt-3">
               <label
                 htmlFor="products"
-                className="block text-sm font-medium leading-6 text-gray-900"
+                className="block text-sm font-medium leading-6 text-blue-800"
               >
                 Products
               </label>
-              <p className="mt-1 text-sm leading-6 text-gray-400">
-                What products should I look at?
+              <p className="mt-1 text-sm leading-6 text-gray-500">
+                Which Contoso products should be featured?
               </p>
               <div className="mt-2">
                 <textarea
@@ -171,7 +194,8 @@ export const Task = () => {
                   name="products"
                   rows={3}
                   cols={60}
-                  className="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  placeholder="Enter product information here..."
+                  className="p-3 block w-full rounded-lg border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-blue-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm sm:leading-6 transition-all duration-200"
                   value={products}
                   onChange={(e) => setProducts(e.target.value)}
                 />
@@ -180,12 +204,12 @@ export const Task = () => {
             <div className="text-start mt-3">
               <label
                 htmlFor="writing"
-                className="block text-sm font-medium leading-6 text-gray-900"
+                className="block text-sm font-medium leading-6 text-blue-800"
               >
                 Assignment
               </label>
-              <p className="mt-1 text-sm leading-6 text-gray-400">
-                What kind of writing should I do?
+              <p className="mt-1 text-sm leading-6 text-gray-500">
+                What specific type of content should we create?
               </p>
               <div className="mt-2">
                 <textarea
@@ -193,7 +217,8 @@ export const Task = () => {
                   name="writing"
                   rows={3}
                   cols={60}
-                  className="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  placeholder="Describe the content format and requirements..."
+                  className="p-3 block w-full rounded-lg border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-blue-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm sm:leading-6 transition-all duration-200"
                   value={writing}
                   onChange={(e) => setWriting(e.target.value)}
                 />
@@ -203,13 +228,13 @@ export const Task = () => {
             </div>
             <div className="text-start mt-3">
               <label
-                htmlFor="writing"
-                className="block text-sm font-medium leading-6 text-gray-900"
+                htmlFor="influence"
+                className="block text-sm font-medium leading-6 text-blue-800"
               >
-                Social media campaign
+                Social Media Campaign
               </label>
-              <p className="mt-1 text-sm leading-6 text-gray-400">
-                What kind of social posts should I create?
+              <p className="mt-1 text-sm leading-6 text-gray-500">
+                What kind of social media posts should be included?
               </p>
               <div className="mt-2">
                 <textarea
@@ -217,38 +242,39 @@ export const Task = () => {
                   name="influence"
                   rows={3}
                   cols={60}
-                  className="p-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  placeholder="Describe the social media content needs..."
+                  className="p-3 block w-full rounded-lg border-0 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-blue-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-500 sm:text-sm sm:leading-6 transition-all duration-200"
                   value={influence}
                   onChange={(e) => setInfluence(e.target.value)}
                 />
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 mt-10">
+            <div className="flex justify-end gap-3 mt-10">
               <button
                 type="button"
-                className="flex flex-row gap-3 items-center rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                className="flex flex-row gap-2 items-center rounded-md bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm border border-gray-200 hover:bg-gray-50 transition-all duration-200"
                 onClick={reset}
               >
-                <ArrowPathIcon className="w-6" />
+                <ArrowPathIcon className="w-5 h-5 text-gray-600" />
                 <span>Reset</span>
               </button>
 
               <button
                 type="button"
-                className="flex flex-row gap-3 items-center rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                className="flex flex-row gap-2 items-center rounded-md bg-gray-100 px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm border border-gray-200 hover:bg-gray-200 transition-all duration-200"
                 onClick={setExample}
               >
-                <ClipboardDocumentIcon className="w-6" />
-                <span>Example</span>
+                <ClipboardDocumentIcon className="w-5 h-5 text-gray-600" />
+                <span>Load Example</span>
               </button>
               <button
                 type="button"
-                className="flex flex-row gap-3 items-center rounded-md bg-indigo-100 px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                className="flex flex-row gap-2 items-center rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 transition-all duration-200"
                 onClick={startWork}
               >
-                <PaperAirplaneIcon className="w-6" />
-                <span>Start Work</span>
+                <PaperAirplaneIcon className="w-5 h-5 text-white" />
+                <span>Create Content</span>
               </button>
             </div>
           </div>) : (<div></div>)

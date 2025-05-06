@@ -1,0 +1,140 @@
+.agent-card {
+  transition: all 0.3s ease-in-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.agent-card.active {
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+}
+
+.agent-card.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #3b82f6, #60a5fa, #93c5fd);
+  animation: progressAnimation 2s ease-in-out infinite;
+}
+
+.agent-card.completed {
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+}
+
+.agent-card.completed::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #10b981, #34d399, #6ee7b7);
+}
+
+.progress-bar {
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes progressAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.agent-pulse {
+  animation: pulse 2s infinite;
+}
+
+.agent-card.active .agent-icon {
+  animation: pulse 1.5s infinite;
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.agent-icon {
+  transition: all 0.3s ease;
+}
+
+.completed .agent-icon {
+  transform: scale(1.1);
+}
+
+/* Add a subtle glowing effect to completed agents */
+.agent-card.completed {
+  position: relative;
+}
+
+.agent-card.completed::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+  opacity: 0;
+  animation: glow 2s ease-in-out forwards;
+}
+
+@keyframes glow {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.3;
+  }
+}
+
+/* Style for the line-clamp utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;  
+  overflow: hidden;
+}
