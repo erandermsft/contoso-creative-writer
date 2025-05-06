@@ -19,7 +19,16 @@ export const Article = () => {
     setMarkdownSource(articles.currentArticle);
   }, [articles.currentArticle, setMarkdownSource]);
 
-  return <Block innerClassName="text-left" outerClassName="mt-10 mb-40">{reactContent}</Block>;
+  return (
+    <div className="fade-in">
+      <Block 
+        innerClassName="text-left prose prose-blue prose-lg max-w-none" 
+        outerClassName="mt-6 mb-40 px-2"
+      >
+        {reactContent}
+      </Block>
+    </div>
+  );
 };
 
 export default Article;

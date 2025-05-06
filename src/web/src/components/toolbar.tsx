@@ -18,9 +18,9 @@ export const Toolbar = () => {
       {articles.articles.length > 0 && (
         <div
           className={clsx(
-            "justify-end shrink self-end align-baseline cursor-pointer  rounded-full p-2 shadow-lg border-zinc-40 hover:cursor-pointer",
-            "bg-white text-zinc-600 mt-auto",
-            "hover:bg-blue-100 hover:text-blue-600"
+            "justify-end shrink self-end align-baseline cursor-pointer rounded-full p-2 shadow-lg border border-blue-100 hover:cursor-pointer",
+            "bg-white text-blue-600 mt-auto",
+            "hover:bg-blue-50 hover:text-blue-800 transition-all duration-300"
           )}
           onClick={() => dispatch(setCurrentArticle(articles.current - 1))}
         >
@@ -30,9 +30,9 @@ export const Toolbar = () => {
       {articles.articles.length > 0 && (
         <div
           className={clsx(
-            "justify-end shrink self-end align-baseline cursor-pointer  rounded-full p-2 shadow-lg border-zinc-40 hover:cursor-pointer",
-            "bg-white text-zinc-600 mt-auto",
-            "hover:bg-blue-100 hover:text-blue-600 w-9"
+            "justify-end shrink self-end align-baseline cursor-pointer rounded-full p-2 shadow-lg border border-blue-100 hover:cursor-pointer",
+            "bg-white text-blue-600 mt-auto font-medium",
+            "hover:bg-blue-50 hover:text-blue-800 transition-all duration-300 w-9"
           )}
         >
           {articles.current + 1}/{articles.articles.length}
@@ -41,9 +41,9 @@ export const Toolbar = () => {
       {articles.articles.length > 0 && (
           <div
             className={clsx(
-              "justify-end shrink self-end align-baseline cursor-pointer  rounded-full p-2 shadow-lg border-zinc-40 hover:cursor-pointer",
-              "bg-white text-zinc-600 mt-auto",
-              "hover:bg-blue-100 hover:text-blue-600"
+              "justify-end shrink self-end align-baseline cursor-pointer rounded-full p-2 shadow-lg border border-blue-100 hover:cursor-pointer",
+              "bg-white text-blue-600 mt-auto",
+              "hover:bg-blue-50 hover:text-blue-800 transition-all duration-300"
             )}
             onClick={() => dispatch(setCurrentArticle(articles.current + 1))}
           >
