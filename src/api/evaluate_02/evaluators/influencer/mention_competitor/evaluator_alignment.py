@@ -1,9 +1,9 @@
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__))))
 
 from sklearn.metrics import cohen_kappa_score
-from custom_evals.marketing_eval import marketing_eval
+from mention_competitor_eval import mention_competitor_eval
 from azure.ai.evaluation import evaluate
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -28,13 +28,11 @@ def evaluate_alignment(args):
         data=input_data_path,
         # target=get_response,
         evaluators={
-            "eval": marketing_eval,
+            "eval": mention_competitor_eval,
         },
         evaluator_config={
-            "default": {
-                "question": "${data.question}",
-                "answer": "${data.answer}",
-                "context": "${data.context}",
+            "eval": {
+                "mediaPost": "${data.mediaPost}",
             },
         },
         #azure_ai_project=azure_ai_project
@@ -43,22 +41,25 @@ def evaluate_alignment(args):
     eval_result = pd.DataFrame(evaluate_results["rows"])
 
     # Extract 'reason' from the JSON strings
-    eval_result['chain of thought'] = eval_result['outputs.eval.output'].apply(lambda x: json.loads(x)['chain of thought'])
+    #eval_result['chain of thought'] = eval_result['outputs.eval.output'].apply(lambda x: json.loads(x)['chain of thought'])
+    eval_result['chain of thought'] = eval_result['outputs.eval.chain of thought']
 
     # Extract 'following guidelines'
-    eval_result['following guidelines'] = eval_result['outputs.eval.output'].apply(lambda x: json.loads(x)['following guidelines'])
+    #eval_result['following guidelines'] = eval_result['outputs.eval.output'].apply(lambda x: json.loads(x)['following guidelines'])
+    eval_result['following guidelines'] = eval_result['outputs.eval.following guidelines']
+
 
     # Save result to an excel file
     #eval_result.to_excel("data/output/evaluation_results.xlsx", index=False)
 
-    evaluator_labels = eval_result["outputs.eval.output"].apply(lambda x: json.loads(x)["following guidelines"]).to_numpy()
+    evaluator_labels = eval_result["outputs.eval.following guidelines"].to_numpy()
 
     # Extract human labels to a array
     human_labels = []
     with open(input_data_path, 'r') as file:
         for line in file:
             json_obj = json.loads(line.strip())
-            human_label = json_obj["human_label"].strip().lower() == 'true'
+            human_label = json_obj["human_label_following_guidelines"].strip().lower() == 'true'
             human_labels.append(human_label)
 
     kappa = cohen_kappa_score(human_labels, evaluator_labels)
@@ -87,7 +88,7 @@ def evaluate_alignment(args):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Evaluate alignment")
-    parser.add_argument("--input_path", type=str, help="Path to the input data file", default="custom_evals/data/input_data/evaluator_alignment_data.jsonl")
+    parser.add_argument("--input_path", type=str, help="Path to the input data file", default="C:/Users/albinlnnflt/OneDrive - Microsoft/Customer/scale_ai_2/contoso-creative-writer/src/api/evaluate_02/evaluators/influencer/mention_competitor/data/input_data/evaluator_alignment_data.jsonl")
     args = parser.parse_args()
 
     input_data_path = args.input_path

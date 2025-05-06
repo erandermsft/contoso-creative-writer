@@ -8,7 +8,7 @@ model:
     azure_deployment: ${env:AZURE_OPENAI_CHATMODEL}
     api_version: ${env:AZURE_OPENAI_API_VERSION}
   parameters:
-    max_tokens: 128
+    max_tokens: 200
     temperature: 0.9
     frequency_penalty: 0.5
 inputs:
@@ -32,11 +32,9 @@ sample:
     additional_instructions: "Please make sure the questions are relevant to the topic and are in a friendly tone."
 ---
 system:
-You are an AI assistant. You task is to generate potential questions to a customer service chat. Be very creative and try to think of all possible questions that a customer might ask. 
+You are an AI assistant. Your task is to generate a request of for something that should be a marketing story for a ecommer of ourdoor gears.
 
-Answer only with the question. Do not include anything else in your response.
-
-You are only allowed to answer with one question.
+Answer only with the request. Do not include any other text or explanation.
 
 user:
 
@@ -44,8 +42,7 @@ user:
 {{context}}
 
 # Question Guidelines:
-- The generated questions should be related to the topic of {{topic}}
-- The tone of the questions should be {{tone}}
-- The questions should be in {{language}}
+- The generated request should be related to the topic of {{topic}}
+- The request should be in {{language}}
 - Additional instructions {{additional_instructions}}
-- The question should be apprxiately {{question_length}} words long
+- The request should be apprxiately {{question_length}} words long
