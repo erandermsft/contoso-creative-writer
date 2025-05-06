@@ -5,6 +5,25 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Python: Current File",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Run influencer eval",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "src/api/evaluate_02/evaluators/influencer/evaluators_influencer.py",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "args": [
+        "--input_path", "src/api/evaluate_02/data/agents_results/agent_result.jsonl",
+    ]
+    },
+    {
       "name": "Python: FastAPI",
       "type": "debugpy",
       "request": "launch",
