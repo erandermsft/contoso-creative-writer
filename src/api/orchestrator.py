@@ -80,7 +80,7 @@ def plan(goal):
     # yield complete_message("researcher", plan_result)
 
 @trace
-def create(research_context, product_context, assignment_context, influencer_context=None, evaluate=False):
+def create(research_context, product_context, assignment_context, influencer_context=None, evaluate=False, output_path=None):
     
     feedback = "No Feedback"
 
@@ -185,6 +185,10 @@ def create(research_context, product_context, assignment_context, influencer_con
             influencer_response = "No influencer response"
         yield complete_message("influencer", influencer_response)
 
+
+    # Store agent input and output if path is provided
+
+
     # yield start_message("publishing")
     # publisher_result = asyncio.run(publisher.publish(full_result))
     # yield complete_message("publishing", publisher_result)
@@ -217,3 +221,19 @@ if __name__ == "__main__":
     Make sure to cite sources in the article as you mention the research not at the end.'''
 
     test_create_article(research_context=research_context, product_context=product_context, assignment_context=assignment_context)
+
+
+def append_to_file(output_path: str, content: dict):
+    """
+    Append a dictionary as a JSON line to a JSONL file.
+    
+    Args:
+        output_path: Path to the JSONL file
+        content: Dictionary to append as a JSON line
+    """
+    # Convert the dictionary to a JSON string with newlines removed to maintain JSONL format
+    json_line = json.dumps(content).replace("\n", "") + "\n"
+    
+    # Open the file in append mode, creating it if it doesn't exist
+    with open(output_path, "a") as f:
+        f.write(json_line)
