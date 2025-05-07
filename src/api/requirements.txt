@@ -22,7 +22,7 @@ azure-identity==1.21.0
 azure-keyvault-secrets
 azure-ai-evaluation
 azure-ai-inference[opentelemetry]
-azure-ai-projects==1.0.0b9
+azure-ai-projects==1.0.0b10
 azure-ai-contentsafety
 azure-ai-ml
 azureml-mlflow
@@ -33,5 +33,5 @@ validators
 tenacity
 marshmallow==3.23.2
 mcp==1.6.0
-semantic-kernel==1.28.1
+semantic-kernel==1.29.0
 

@@ -1,6 +1,7 @@
 from promptflow.core import Prompty, AzureOpenAIModelConfiguration
 import json
 import os 
+import logging
 from prompty.tracer import trace
 from openai import AzureOpenAI
 from dotenv import load_dotenv 
@@ -13,6 +14,7 @@ from semantic_kernel.connectors.ai import FunctionChoiceBehavior
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion, AzureChatPromptExecutionSettings
 from semantic_kernel.connectors.mcp import MCPSsePlugin, MCPWebsocketPlugin
 from semantic_kernel.contents import ChatHistory
+from semantic_kernel.utils.logging import setup_logging
 
 import prompty
 folder = Path(__file__).parent.absolute().as_posix()
@@ -148,6 +150,10 @@ def influence(article, customers, instructions):
 
 @trace
 async def influence_sk(article, customers, instructions):
+    setup_logging()
+    
+    logging.getLogger("kernel").setLevel(logging.DEBUG)
+    logging.getLogger("semantic_kernel.connectors.mcp").setLevel(logging.DEBUG)
 
     print("Influencing...")
 

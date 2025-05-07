@@ -100,7 +100,7 @@ def setup_telemetry_full(app: FastAPI):
 
 
     # Setting upp prompty tracer.
-    json_tracer = PromptyTracer()
+    #json_tracer = PromptyTracer()
     #Tracer.add("PromptyTracer", json_tracer.tracer)       
     Tracer.add("OpenTelemetry", trace_span)
 
