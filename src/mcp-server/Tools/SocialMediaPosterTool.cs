@@ -11,11 +11,10 @@ public sealed class SocialMediaPosterTool
     public static async Task<string> PostSocialMedia(
         ServiceBusSocialMediaEventSender eventSender,
         ILogger<SocialMediaPosterTool> logger,
-        [Description("The target customer")] string customer,
         [Description("The social media post")] string socialMediaPost,
         CancellationToken cancellationToken)
     {
-        logger.LogInformation("Posting influencer post to {Customer}", customer);
+        logger.LogInformation("Posting influencer post");
         
         try
         {

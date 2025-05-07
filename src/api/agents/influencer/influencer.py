@@ -26,7 +26,7 @@ class SocialMediaPosts(BaseModel):
 system_prompt = """
 system:
 You are a social media influencer. Your job is to design a social media post tailored to a specific customer. 
-You will have tools available to post the finished social media post.
+You will have functions available to post the finished social media post, please do that if the post is good enough.
 The social media post should be based on the contents of a blog article that has been created by our senior copywriter. Use emojis and other appropriate social media elements to make the post engaging and fun.
 Respond in JSON format with an array of objects where each object contains the name of the customer and the social media post. Explicitly mention the customer's income level and how many products they can buy with their income.
 
@@ -154,7 +154,7 @@ async def influence_sk(article, customers, instructions):
     kernel = Kernel()
 
     chat_completion = AzureChatCompletion(
-        deployment_name=os.getenv("AZURE_OPENAI_O3_MINI_DEPLOYMENT_NAME"),
+        deployment_name=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
         api_version="2024-12-01-preview",
         api_key=os.getenv("APIM_SUBSCRIPTION_KEY"),
         endpoint=os.getenv("APIM_ENDPOINT"),
@@ -163,7 +163,7 @@ async def influence_sk(article, customers, instructions):
     kernel.add_service(chat_completion)
     
     request_settings = AzureChatPromptExecutionSettings(
-        max_completion_tokens=3000,
+        max_tokens=3000,
         function_choice_behavior=FunctionChoiceBehavior.Auto(),
         response_format={ "type": "json_object" }
     )
@@ -199,7 +199,7 @@ async def influence_sk(article, customers, instructions):
     formattedSystemPrompt = system_prompt.format(customers=customers, article=article, instructions=instructions)
 
     chatHistory = ChatHistory(system_message=formattedSystemPrompt)
-    chatHistory.add_user_message("Please create the social media posts, if its good enough please post it to the social media tool")
+    chatHistory.add_user_message("Please create the social media posts, if its good enough please use the PublisherTools to post it to social media")
     
     result = await chat_completion.get_chat_message_contents(
         chat_history=chatHistory,

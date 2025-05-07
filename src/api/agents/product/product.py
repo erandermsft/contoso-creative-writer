@@ -29,7 +29,7 @@ def generate_embeddings(queries: List[str]) -> str:
 
     client = AzureOpenAI(
         azure_endpoint=APIM_ENDPOINT,
-        api_version=AZURE_OPENAI_VERSION,
+        api_version="2024-12-01-preview",
         api_key=APIM_SUBSCRIPTION_KEY
     )
 
@@ -86,7 +86,7 @@ def find_products(context: str) -> Dict[str, any]:
     
     client = AzureOpenAI(
         azure_endpoint=APIM_ENDPOINT,
-        api_version=AZURE_OPENAI_VERSION,
+        api_version="2024-12-01-preview",
         api_key=APIM_SUBSCRIPTION_KEY
     )
     
@@ -96,9 +96,9 @@ def find_products(context: str) -> Dict[str, any]:
 
     # Get product queries
     response = client.chat.completions.create(
-        model=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
+        model=os.getenv("AZURE_OPENAI_O3_MINI_DEPLOYMENT_NAME"),
         messages=messages,
-        max_tokens=prompt_template.parameters["max_tokens"],
+        max_completion_tokens=prompt_template.parameters["max_tokens"],
         response_format=prompt_template.parameters["response_format"],
     )
     queries = response.choices[0].message.content

@@ -16,7 +16,7 @@ def editor_feedback(article, feedback):
 
     client = AzureOpenAI(
         azure_endpoint=os.getenv("APIM_ENDPOINT"),
-        api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
+        api_version="2024-12-01-preview",
         api_key=os.getenv("APIM_SUBSCRIPTION_KEY"),
     )
     
@@ -25,10 +25,9 @@ def editor_feedback(article, feedback):
     messages = prompt_template.create_messages(article=article, feedback=feedback)
 
     response = client.chat.completions.create(
-        model=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
+        model=os.getenv("AZURE_OPENAI_O3_MINI_DEPLOYMENT_NAME"),
         messages=messages,
-        max_tokens=prompt_template.parameters["max_tokens"],
-        temperature=prompt_template.parameters["temperature"],
+        max_completion_tokens=prompt_template.parameters["max_tokens"],
         response_format=prompt_template.parameters["response_format"],
     )
 

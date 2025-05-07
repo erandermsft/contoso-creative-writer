@@ -176,8 +176,8 @@ def create(research_context, product_context, assignment_context, influencer_con
     # Send the article to the influencer
     if influencer_context:
         yield start_message("influencer")
-        #influencer_response = asyncio.run(influencer.influence_sk(article=processed_writer_result['article'], customers=None, instructions=influencer_context))
-        influencer_response = influencer.influence(article=processed_writer_result['article'], customers=None, instructions=influencer_context)
+        influencer_response = asyncio.run(influencer.influence_sk(article=processed_writer_result['article'], customers=None, instructions=influencer_context))
+        #influencer_response = influencer.influence(article=processed_writer_result['article'], customers=None, instructions=influencer_context)
         influencer_response = json.loads(influencer_response)
         if influencer_response is not None and "posts" in influencer_response:
             influencer_response = influencer_response["posts"]

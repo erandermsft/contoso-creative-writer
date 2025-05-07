@@ -2,7 +2,8 @@
   "default": {
     "type": "azure",
     "api_version": "${env:AZURE_OPENAI_API_VERSION}",
-    "azure_endpoint": "${env:AZURE_OPENAI_ENDPOINT}",
-    "azure_deployment": "${env:AZURE_OPENAI_DEPLOYMENT:gpt-4}"
+    "azure_endpoint": "${env:APIM_ENDPOINT}",
+    "azure_deployment": "${env:AZURE_OPENAI_DEPLOYMENT:gpt-4}",
+    "api_key": "${env:APIM_SUBSCRIPTION_KEY}"
   }
 }
